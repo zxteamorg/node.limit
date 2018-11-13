@@ -1,0 +1,41 @@
+{
+	"name": "limit.js",
+	"version": "0.0.1",
+	"description": "Limit JS",
+	"main": "./src/index.js",
+	"types": "./src/index.d.ts",
+	"author": {
+		"name": "Maxim Anurin",
+		"email": "maxim.anurin@zxteam.org",
+		"url": "http://www.anurin.name"
+	},
+	"contributors": [
+		{
+			"name": "Serg Zgama",
+			"email": "serg.zgama@zxteam.org"
+		}
+	],
+	"license": "MIT",
+	"devDependencies": {
+		"@zxnode/build": "^0.0.23",
+		"mocha-allure-reporter": "^1.4.0",
+		"mocha-multi-reporters": "^1.1.7",
+		"nyc": "^13.1.0"
+	},
+	"dependencies": {
+		"ptask.js": "0.0.5"
+	},
+	"keywords": [],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zxteamorg/limit.js.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zxteamorg/limit.js/issues"
+	},
+	"homepage": "https://github.com/zxteamorg/limit.js#readme",
+	"scripts": {
+		"test": "nyc --exclude submodules --exclude test --reporter=lcov --reporter=text --reporter=text-summary mocha 'test/**/*.test.js' --recursive --timeout 10000 --reporter mocha-multi-reporters --reporter-options configFile=test/config.json"
+	},
+	"private": true
+}
