@@ -17,13 +17,13 @@
 	],
 	"license": "MIT",
 	"devDependencies": {
-		"@zxnode/build": "^0.0.23",
+		"@types/sinon": "^5.0.5",
+		"@zxnode/build": "0.0.23",
 		"mocha-allure-reporter": "^1.4.0",
 		"mocha-multi-reporters": "^1.1.7",
-		"nyc": "^13.1.0"
-	},
-	"dependencies": {
-		"ptask.js": "0.0.5"
+		"nyc": "^13.1.0",
+		"ptask.js": "0.0.6",
+		"sinon": "^7.1.1"
 	},
 	"keywords": [],
 	"repository": {
