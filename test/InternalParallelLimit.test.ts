@@ -8,7 +8,7 @@ describe(`${InternalParallelLimit.name} tests`, function () {
 	it("Should be able to instance and destroy", async function () {
 		const mylimit = new InternalParallelLimit(2);
 		mylimit.accrueToken().commit();
-		mylimit.destroy();
+		await mylimit.dispose();
 	});
 	it("Should be equal maxTokens to hitCount", async function () {
 		// Setup limit for 2 parallel call

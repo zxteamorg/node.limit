@@ -92,28 +92,34 @@ async function InternalTimespanLimitSyncTest() {
 
 async function LimitFactoryViaPromiseTest() {
 	const limit = LimitFactory({
-		perSecond: 3
-		// ,
-		// perMinute: 30
+		parallel: 2,
+		perSecond: 5,
+		perMinute: 30,
+		perHour: 300
 	});
 
 	let completedJobCount = 0;
 	const jobPromises = [];
 
-	for (let taskId = 0; taskId < 1200; taskId++) {
+	for (let taskId = 0; taskId < 120; taskId++) {
 		jobPromises.push(
-			limit.accrueTokenLazy(1000000000).then(async (token) => {
-				const jobCount = ++completedJobCount;
-				console.log(`${jobCount} Job#${taskId} was run at ${new Date().toISOString()}`);
-				await Task.sleep(0);
-				token.commit();
-				console.log(`${jobCount} Job#${taskId} was committed. Available Tokens: ${limit.availableTokens}`);
-			}));
+			limit.accrueTokenLazy(5000)
+				.then(async (token) => {
+					const jobCount = ++completedJobCount;
+					console.log(`${jobCount} Job#${taskId} was run at ${new Date().toISOString()}`);
+					await Task.sleep(0);
+					token.commit();
+					console.log(`${jobCount} Job#${taskId} was committed. Available Tokens: ${limit.availableTokens}`);
+				})
+				.catch(reason => console.error(reason))
+		);
 	}
 
 	console.log(`Starts at ${new Date().toISOString()}`);
 	await Promise.all(jobPromises);
 	console.log(`Ends at   ${new Date().toISOString()}`);
+	await limit.dispose();
+	console.log(`Limit was dispose at   ${new Date().toISOString()}`);
 }
 
 async function LimitFactoryViaCallableTest() {
@@ -151,8 +157,9 @@ async function LimitFactoryViaCallableTest() {
 			job(token).then(() => {
 				completedJobs++;
 				if (completedJobs === taskCount) {
-					limit.destroy();
-					console.log(`Ends at   ${new Date().toISOString()}`);
+					return limit.dispose().then(() => {
+						console.log(`Ends at   ${new Date().toISOString()}`);
+					});
 				}
 			});
 			limit.accrueTokenLazy(10000000, tokenCallback);
@@ -187,10 +194,20 @@ async function LimitFactoryAccrueWithTimeoutTest() {
 async function main() {
 	await LimitFactoryViaCallableTest();
 	//await LimitFactoryAccrueWithTimeoutTest();
+
+	//await LimitFactoryViaPromiseTest();
 }
 
+console.log((process as any)._getActiveRequests());
+console.log((process as any)._getActiveHandles());
+console.log("============================");
 main()
 	.catch(async (reason) => {
 		console.log(reason);
 	})
-	.then(() => Task.sleep(1000));
+	.then(async () => {
+		console.log("Exit in 1 sec...");
+		console.log((process as any)._getActiveRequests());
+		console.log((process as any)._getActiveHandles());
+		await Task.sleep(1000);
+	});

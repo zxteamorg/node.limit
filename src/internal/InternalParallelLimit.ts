@@ -1,20 +1,21 @@
 import { LimitToken, LimitError } from "../contract";
-
 import { InternalLimitSyncBase } from "./common";
+import { Deferred } from "./misc";
 
 
 export class InternalParallelLimit extends InternalLimitSyncBase {
 	private readonly _maxTokens: number;
-	private _availableTokens: number;
+	private _activeTokenDefers: Array<Deferred>;
+
 	public constructor(hitCount: number) {
 		super();
 		this._maxTokens = hitCount;
-		this._availableTokens = hitCount;
+		this._activeTokenDefers = [];
 	}
 
 	public get availableTokens(): number {
 		this.verifyDestroy();
-		return this._availableTokens;
+		return this._maxTokens - this._activeTokenDefers.length;
 	}
 
 	public get maxTokens(): number {
@@ -24,37 +25,35 @@ export class InternalParallelLimit extends InternalLimitSyncBase {
 
 	public accrueToken(): LimitToken {
 		this.verifyDestroy();
-		if (this._availableTokens === 0) { throw new LimitError("No any available tokens"); }
-		this._availableTokens--;
-		let tokenDisposed = false;
+		if (this.availableTokens === 0) { throw new LimitError("No any available tokens"); }
+		let defer: Deferred | null = Deferred.create<void>();
+		this._activeTokenDefers.push(defer);
 		const token: LimitToken = {
 			commit: () => {
-				if (!tokenDisposed) {
-					tokenDisposed = true;
-					this._commitToken(token);
+				if (defer !== null) {
+					defer.resolve();
+					const index = this._activeTokenDefers.indexOf(defer);
+					this._activeTokenDefers.splice(index, 1);
+					defer = null;
+					this.raiseReleaseToken();
 				}
 			},
 			rollback: () => {
-				if (!tokenDisposed) {
-					tokenDisposed = true;
-					this._rollbackToken(token);
+				if (defer !== null) {
+					defer.resolve();
+					const index = this._activeTokenDefers.indexOf(defer);
+					this._activeTokenDefers.splice(index, 1);
+					defer = null;
+					this.raiseReleaseToken();
 				}
 			}
 		};
 		return token as LimitToken;
 	}
 
-	protected destroying(): void {
-		// do nothing in this limit
-	}
-
-	private _commitToken(token: LimitToken): void {
-		this._availableTokens++;
-		this.raiseReleaseToken();
-	}
-
-	private _rollbackToken(token: LimitToken): void {
-		this._availableTokens++;
-		this.raiseReleaseToken();
+	protected onDispose(): Promise<void> {
+		return Promise.all(this._activeTokenDefers).then(() => {
+			//void
+		});
 	}
 }

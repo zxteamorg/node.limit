@@ -1,29 +1,32 @@
 import { LimitToken, LimitError } from "../contract";
-
 import { InternalLimitSyncBase } from "./common";
+import { Deferred } from "./misc";
 
 export class InternalTimespanLimit extends InternalLimitSyncBase {
 	private readonly _maxTokens: number;
+	private _activeTokenDefers: Array<Deferred>;
 	private readonly _delay: number;
 	private readonly _clearTimeoutFunc: (handle?: number) => void;
 	private readonly _setTimeoutFunc: (handler: TimerHandler, timeout?: number) => number;
 	private readonly _timers: Array<number> = [];
-	private _availableTokens: number;
 
 	public constructor(delay: number, hitCount: number,
-		stubs: { clearTimeoutFunc: (handle?: number) => void, setTimeoutFunc: (handler: TimerHandler, timeout?: number) => number }
+		stubs: {
+			clearTimeoutFunc: (handle?: number) => void,
+			setTimeoutFunc: (handler: TimerHandler, timeout?: number) => number
+		}
 			= { clearTimeoutFunc: clearTimeout, setTimeoutFunc: setTimeout }) {
 		super();
 		this._maxTokens = hitCount;
 		this._delay = delay;
 		this._clearTimeoutFunc = stubs.clearTimeoutFunc;
 		this._setTimeoutFunc = stubs.setTimeoutFunc;
-		this._availableTokens = hitCount;
+		this._activeTokenDefers = [];
 	}
 
 	public get availableTokens(): number {
 		this.verifyDestroy();
-		return this._availableTokens;
+		return this._maxTokens - this._activeTokenDefers.length;
 	}
 
 	public get maxTokens(): number {
@@ -33,42 +36,43 @@ export class InternalTimespanLimit extends InternalLimitSyncBase {
 
 	public accrueToken(): LimitToken {
 		this.verifyDestroy();
-		if (this._availableTokens === 0) { throw new LimitError("No any available tokens"); }
-		this._availableTokens--;
-		let tokenDisposed = false;
+		if (this.availableTokens === 0) { throw new LimitError("No any available tokens"); }
+		let defer: Deferred | null = Deferred.create<void>();
+		this._activeTokenDefers.push(defer);
 		const token: LimitToken = {
 			commit: () => {
-				if (!tokenDisposed) {
-					tokenDisposed = true;
-					this._commitToken();
+				if (defer !== null) {
+					const timer = this._setTimeoutFunc(() => {
+						if (defer !== null) {
+							const timerIndex = this._timers.indexOf(timer);
+							if (timerIndex !== -1) { this._timers.splice(timerIndex, 1); }
+							const index = this._activeTokenDefers.indexOf(defer);
+							this._activeTokenDefers.splice(index, 1);
+							defer.resolve();
+							defer = null;
+							this.raiseReleaseToken();
+						}
+					}, this._delay);
+					this._timers.push(timer);
 				}
 			},
 			rollback: () => {
-				if (!tokenDisposed) {
-					tokenDisposed = true;
-					this._rollbackToken();
+				if (defer !== null) {
+					defer.resolve();
+					const index = this._activeTokenDefers.indexOf(defer);
+					this._activeTokenDefers.splice(index, 1);
+					defer = null;
+					this.raiseReleaseToken();
 				}
 			}
 		};
 		return token as LimitToken;
 	}
 
-	protected destroying(): void {
+	protected onDispose(): Promise<void> {
 		this._timers.forEach(t => this._clearTimeoutFunc(t));
-	}
-
-	private _commitToken(): void {
-		const timer = this._setTimeoutFunc(() => {
-			const timerIndex = this._timers.indexOf(timer);
-			if (timerIndex !== -1) { this._timers.splice(timerIndex, 1); }
-			this._availableTokens++;
-			this.raiseReleaseToken();
-		}, this._delay);
-		this._timers.push(timer);
-	}
-
-	private _rollbackToken(): void {
-		this._availableTokens++;
-		this.raiseReleaseToken();
+		return Promise.all(this._activeTokenDefers).then(() => {
+			//void
+		});
 	}
 }

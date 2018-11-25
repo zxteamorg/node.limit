@@ -1,11 +1,11 @@
-import { Limit, LimitError, LimitOpts, LimitToken } from "./contract";
-import { throwConfigurationError, InternalLimit } from "./internal/common";
-import { InternalParallelLimit  } from "./internal/InternalParallelLimit";
+import { Limit, LimitError, LimitToken, TokenLazyCallback } from "./contract";
+import { throwConfigurationError, InternalLimit, AssertError } from "./internal/common";
+import { InternalParallelLimit } from "./internal/InternalParallelLimit";
 import { InternalTimespanLimit } from "./internal/InternalTimespanLimit";
 
 export * from "./contract";
 
-function buildInnerLimits(opts: LimitOpts): Array<InternalLimit> {
+function buildInnerLimits(opts: Limit.Opts): Array<InternalLimit> {
 	const innerLimits: Array<InternalLimit> = [];
 
 	if (opts.perHour) {
@@ -51,34 +51,55 @@ function buildInnerLimits(opts: LimitOpts): Array<InternalLimit> {
 	return innerLimits;
 }
 
-export function LimitFactory(opts: LimitOpts): Limit {
+export function LimitFactory(opts: Limit.Opts): Limit {
 	const innerLimits = buildInnerLimits(opts);
+	const busyLimits: Array<InternalLimit> = [];
+	const waitForTokenCallbacks: Array<[TokenLazyCallback, any]> = [];
+
+	function onBusyLimitsReleased() {
+		while (waitForTokenCallbacks.length > 0) {
+			const token = _accrueAggregatedToken();
+			if (token === null) { break; }
+
+			const tulpe = waitForTokenCallbacks.shift();
+			if (!tulpe) {
+				throw new AssertError();
+			}
+			const [cb, timer] = tulpe;
+			clearTimeout(timer);
+			cb(undefined, token);
+		}
+	}
 
 	function _accrueAggregatedToken(): LimitToken | null {
+		if (busyLimits.length > 0) { return null; }
 		const innerTokens: Array<LimitToken> = [];
-		let error;
-		try {
-			for (let innerLimitIndex = 0; innerLimitIndex < innerLimits.length; innerLimitIndex++) {
-				const innerLimit = innerLimits[innerLimitIndex];
-				if (innerLimit.availableTokens === 0) {
-					// There are no reason to accrue next token
-					break;
-				}
+		for (let innerLimitIndex = 0; innerLimitIndex < innerLimits.length; innerLimitIndex++) {
+			const innerLimit = innerLimits[innerLimitIndex];
+			if (innerLimit.availableTokens === 0) {
+				busyLimits.push(innerLimit);
+			} else {
 				innerTokens.push(innerLimit.accrueToken());
 			}
-		} catch (e) {
-			error = e;
 		}
-		if (innerLimits.length === innerTokens.length && !error) {
+		if (innerLimits.length === innerTokens.length) {
 			return {
 				commit: () => { innerTokens.forEach(it => it.commit()); },
 				rollback: () => { innerTokens.forEach(it => it.rollback()); }
 			};
 		} else {
 			innerTokens.forEach(it => it.rollback());
-			if (error && !(error instanceof LimitError)) {
-				throw error;
-			}
+			busyLimits.forEach(bl => {
+				function onReleaseBusyLimit() {
+					bl.removeReleaseTokenListener(onReleaseBusyLimit);
+					const blIndex = busyLimits.indexOf(bl);
+					busyLimits.splice(blIndex, 1);
+					if (busyLimits.length === 0) {
+						onBusyLimitsReleased();
+					}
+				}
+				bl.addReleaseTokenListener(onReleaseBusyLimit);
+			});
 			return null;
 		}
 	}
@@ -88,8 +109,9 @@ export function LimitFactory(opts: LimitOpts): Limit {
 		if (aggregatedToken != null) {
 			return aggregatedToken;
 		}
-		throw new LimitError("No any available tokens");
+		throw new LimitError("No available tokens");
 	}
+
 	async function accrueTokenLazyPromise(timeout: number): Promise<LimitToken> {
 		return new Promise<LimitToken>((resolve, reject) => {
 			accrueTokenLazyCallback(timeout, (err, token) => {
@@ -101,49 +123,26 @@ export function LimitFactory(opts: LimitOpts): Limit {
 			});
 		});
 	}
-	function accrueTokenLazyCallback(timeout: number, cb: (err: any, limitToken?: LimitToken) => void): void {
-		function accrueAggregatedTokenAndFireCallback(): boolean {
-			try {
-				const aggregatedToken = _accrueAggregatedToken();
-				if (aggregatedToken != null) {
-					cb(null, aggregatedToken); return true;
-				} else {
-					return false;
-				}
-			} catch (e) {
-				cb(e);
-				return true;
-			}
-		}
 
-		if (accrueAggregatedTokenAndFireCallback()) { return; }
+	function accrueTokenLazyCallback(timeout: number, cb: TokenLazyCallback): void {
+		const token = _accrueAggregatedToken();
+		if (token !== null) {
+			cb(undefined, token);
+			return;
+		}
 
 		// Timeout
+		let tuple: [TokenLazyCallback, number];
 		const timer = setTimeout(() => {
-			// remove listeners
-			innerLimits.map(il => il.removeReleaseTokenListener(onReleaseToken));
+			const tupleIndex = waitForTokenCallbacks.indexOf(tuple);
+			if (tupleIndex < 0) { throw new AssertError(); }
+			waitForTokenCallbacks.splice(tupleIndex, 1);
 			cb(new LimitError(`Timeout: Token was not accrued in ${timeout} ms`));
 		}, timeout);
-
-		// Released tokens
-		innerLimits.map(il => il.addReleaseTokenListener(onReleaseToken));
-		let insideOnReleaseToken = false;
-		function onReleaseToken(availableTokens: number) {
-			if (insideOnReleaseToken) { return; }
-			insideOnReleaseToken = true;
-			try {
-				if (availableTokens > 0) {
-					if (accrueAggregatedTokenAndFireCallback()) {
-						clearTimeout(timer);
-						// remove listeners
-						innerLimits.map(il => il.removeReleaseTokenListener(onReleaseToken));
-					}
-				}
-			} finally {
-				insideOnReleaseToken = false;
-			}
-		}
+		tuple = [cb, timer as any];
+		waitForTokenCallbacks.push(tuple);
 	}
+
 	function accrueTokenLazyOverrides(...args: Array<any>): any {
 		if (args.length === 1) {
 			const possibleTimeout = args[0];
@@ -158,8 +157,10 @@ export function LimitFactory(opts: LimitOpts): Limit {
 		throw Error("Wrong arguments");
 	}
 
-	function destroy() {
-		innerLimits.forEach(il => il.destroy());
+	function dispose(): Promise<void> {
+		return Promise.all(innerLimits.map(il => il.dispose())).then(() => {
+			//
+		});
 	}
 
 	return {
@@ -171,7 +172,7 @@ export function LimitFactory(opts: LimitOpts): Limit {
 		},
 		accrueTokenImmediately,
 		accrueTokenLazy: accrueTokenLazyOverrides,
-		destroy
+		dispose
 	};
 }
 
