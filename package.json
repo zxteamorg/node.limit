@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "0.0.1-pre000",
+	"version": "0.0.1-pre001",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
@@ -19,7 +19,7 @@
 	"devDependencies": {
 		"@types/node": "^10.12.10",
 		"@types/sinon": "^5.0.5",
-		"@zxnode/build": "0.0.23",
+		"@zxnode/build": "0.0.28",
 		"mocha-allure-reporter": "^1.4.0",
 		"mocha-multi-reporters": "^1.1.7",
 		"nyc": "^13.1.0",
