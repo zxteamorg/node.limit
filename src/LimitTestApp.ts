@@ -1,11 +1,12 @@
-import Task from "ptask.js";
-
 import { LimitFactory } from "./index";
 import { Deferred } from "./internal/misc";
 import { InternalParallelLimit } from "./internal/InternalParallelLimit";
 import { InternalTimespanLimit } from "./internal/InternalTimespanLimit";
 import { LimitError, LimitToken } from "./contract";
 
+function sleep(ms: number) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function InternalParallelLimitSyncTest() {
 	const factory = new InternalParallelLimit(2);
@@ -24,7 +25,7 @@ async function InternalParallelLimitSyncTest() {
 			async (token: LimitToken) => {
 				const jobCount = ++completedJobCount;
 				console.log(`${jobCount} Job#${taskId} was run at ${new Date().toISOString()}`);
-				await Task.sleep(1000);
+				await sleep(1000);
 				token.commit();
 				console.log(`${jobCount} Job#${taskId} was committed. Available Tokens: ${factory.availableTokens}`);
 			});
@@ -66,7 +67,7 @@ async function InternalTimespanLimitSyncTest() {
 			async (token: LimitToken) => {
 				const jobCount = ++completedJobCount;
 				console.log(`${jobCount} Job#${taskId} was run at ${new Date().toISOString()}`);
-				await Task.sleep(0);
+				await sleep(0);
 				token.commit();
 				console.log(`${jobCount} Job#${taskId} was committed. Available Tokens: ${factory.availableTokens}`);
 			});
@@ -107,7 +108,7 @@ async function LimitFactoryViaPromiseTest() {
 				.then(async (token) => {
 					const jobCount = ++completedJobCount;
 					console.log(`${jobCount} Job#${taskId} was run at ${new Date().toISOString()}`);
-					await Task.sleep(0);
+					await sleep(0);
 					token.commit();
 					console.log(`${jobCount} Job#${taskId} was committed. Available Tokens: ${limit.availableTokens}`);
 				})
@@ -142,7 +143,7 @@ async function LimitFactoryViaCallableTest() {
 			async (token: LimitToken) => {
 				const jobCount = ++completedJobCount;
 				//console.log(`${jobCount} Job#${taskId}   was   run   at ${new Date().toISOString()}`);
-				await Task.sleep(250);
+				await sleep(250);
 				token.commit();
 				console.log(`${jobCount} Job#${taskId} was committed at ${new Date().toISOString()}`);
 			});
@@ -209,5 +210,5 @@ main()
 		console.log("Exit in 1 sec...");
 		console.log((process as any)._getActiveRequests());
 		console.log((process as any)._getActiveHandles());
-		await Task.sleep(1000);
+		await sleep(1000);
 	});

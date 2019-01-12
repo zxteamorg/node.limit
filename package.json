@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "0.0.1-pre001",
+	"version": "0.0.2",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
@@ -18,13 +18,9 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^10.12.10",
-		"@types/sinon": "^5.0.5",
-		"@zxnode/build": "0.0.28",
-		"mocha-allure-reporter": "^1.4.0",
-		"mocha-multi-reporters": "^1.1.7",
-		"nyc": "^13.1.0",
-		"ptask.js": "0.0.6",
-		"sinon": "^7.1.1"
+		"@types/sinon": "^7.0.3",
+		"@zxnode/build": "0.0.30",
+		"sinon": "^7.2.2"
 	},
 	"keywords": [],
 	"repository": {
@@ -37,7 +33,7 @@
 	"homepage": "https://github.com/zxteamorg/limit.js#readme",
 	"scripts": {
 		"build": "zxbuild clean dist",
-		"test": "nyc --exclude submodules --exclude test --reporter=lcov --reporter=text --reporter=text-summary mocha 'test/**/*.test.js' --recursive --timeout 10000 --reporter mocha-multi-reporters --reporter-options configFile=test/config.json"
+		"test": "nyc --exclude submodules --exclude test --reporter=lcov --reporter=text --reporter=text-summary mocha 'test/**/*.test.js' --recursive --timeout 10000"
 	},
 	"private": true
 }
