@@ -53,7 +53,6 @@ describe("InternalTimespanLimit tests", function () {
 	it("Should be able to instance and destroy", async function () {
 		const mylimit = new InternalTimespanLimit(1000, 2);
 		mylimit.accrueToken().commit();
-		await mylimit.dispose();
 	});
 	it("Should be equal maxTokens to hitCount", async function () {
 		assert.equal(limit.maxTokens, 2);

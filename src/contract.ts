@@ -28,5 +28,4 @@ export interface Limit {
 	//exec<T>(accrueTokenTimeout: number, job: () => T | Promise<T>): T;
 	//exec<T>(accrueTokenTimeout: number, job: () => Promise<T>): Promise<T>;
 	//addReleaseTokenListener(cb: (availableTokens: number) => void): void;
-	dispose(): Promise<void>;
 }

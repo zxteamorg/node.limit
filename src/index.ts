@@ -1,5 +1,5 @@
 import { Limit, LimitError, LimitToken, TokenLazyCallback } from "./contract";
-import { throwConfigurationError, InternalLimit, AssertError } from "./internal/common";
+import { throwLimitConfigurationError, InternalLimit, AssertError } from "./internal/common";
 import { InternalParallelLimit } from "./internal/InternalParallelLimit";
 import { InternalTimespanLimit } from "./internal/InternalTimespanLimit";
 
@@ -11,21 +11,21 @@ function buildInnerLimits(opts: Limit.Opts): Array<InternalLimit> {
 	if (opts.perHour) {
 		let count = opts.perHour;
 		if (count <= 0) {
-			return throwConfigurationError("perHour count value should be above zero integer");
+			return throwLimitConfigurationError("perHour count value should be above zero integer");
 		}
 		innerLimits.push(new InternalTimespanLimit(1000 * 60 * 60/* 1 hour */, count));
 	}
 	if (opts.perMinute) {
 		let count = opts.perMinute;
 		if (count <= 0) {
-			return throwConfigurationError("perMinute count value should be above zero integer");
+			return throwLimitConfigurationError("perMinute count value should be above zero integer");
 		}
 		innerLimits.push(new InternalTimespanLimit(1000 * 60/* 1 minute */, count));
 	}
 	if (opts.perSecond) {
 		const count = opts.perSecond;
 		if (count <= 0) {
-			return throwConfigurationError("perSecond count value should be above zero integer");
+			return throwLimitConfigurationError("perSecond count value should be above zero integer");
 		}
 		innerLimits.push(new InternalTimespanLimit(1000/* 1 second */, count));
 	}
@@ -33,17 +33,17 @@ function buildInnerLimits(opts: Limit.Opts): Array<InternalLimit> {
 		const count: number = opts.perTimespan.count;
 		const delay: number = opts.perTimespan.delay;
 		if (count <= 0) {
-			return throwConfigurationError("perTimespan count value should be above zero integer");
+			return throwLimitConfigurationError("perTimespan count value should be above zero integer");
 		}
 		if (delay <= 0) {
-			return throwConfigurationError("perTimespan delay value should be above zero integer");
+			return throwLimitConfigurationError("perTimespan delay value should be above zero integer");
 		}
 		innerLimits.push(new InternalTimespanLimit(delay, count));
 	}
 	if (opts.parallel) {
 		let count = opts.parallel;
 		if (count <= 0) {
-			return throwConfigurationError("parallel count value should be above zero integer");
+			return throwLimitConfigurationError("parallel count value should be above zero integer");
 		}
 		innerLimits.push(new InternalParallelLimit(count));
 	}
@@ -157,12 +157,6 @@ export function LimitFactory(opts: Limit.Opts): Limit {
 		throw Error("Wrong arguments");
 	}
 
-	function dispose(): Promise<void> {
-		return Promise.all(innerLimits.map(il => il.dispose())).then(() => {
-			//
-		});
-	}
-
 	return {
 		get maxTokens() {
 			return Math.min(...innerLimits.map(f => f.maxTokens));
@@ -171,8 +165,7 @@ export function LimitFactory(opts: Limit.Opts): Limit {
 			return Math.min(...innerLimits.map(f => f.availableTokens));
 		},
 		accrueTokenImmediately,
-		accrueTokenLazy: accrueTokenLazyOverrides,
-		dispose
+		accrueTokenLazy: accrueTokenLazyOverrides
 	};
 }
 

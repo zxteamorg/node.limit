@@ -119,8 +119,6 @@ async function LimitFactoryViaPromiseTest() {
 	console.log(`Starts at ${new Date().toISOString()}`);
 	await Promise.all(jobPromises);
 	console.log(`Ends at   ${new Date().toISOString()}`);
-	await limit.dispose();
-	console.log(`Limit was dispose at   ${new Date().toISOString()}`);
 }
 
 async function LimitFactoryViaCallableTest() {
@@ -158,9 +156,7 @@ async function LimitFactoryViaCallableTest() {
 			job(token).then(() => {
 				completedJobs++;
 				if (completedJobs === taskCount) {
-					return limit.dispose().then(() => {
-						console.log(`Ends at   ${new Date().toISOString()}`);
-					});
+					console.log(`Ends at   ${new Date().toISOString()}`);
 				}
 			});
 			limit.accrueTokenLazy(10000000, tokenCallback);

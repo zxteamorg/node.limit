@@ -5,40 +5,10 @@ export interface InternalLimit {
 	readonly maxTokens: number;
 	accrueToken(): LimitToken;
 	addReleaseTokenListener(cb: (availableTokens: number) => void): void;
-	dispose(): Promise<void>;
 	removeReleaseTokenListener(cb: (availableTokens: number) => void): void;
 }
 
-export abstract class Disposable {
-	private _disposed?: boolean;
-	private _disposingPromise?: Promise<void>;
-
-	public get disposed(): boolean { return !!this._disposed; }
-	public get disposing(): boolean { return !!this._disposingPromise; }
-
-	public dispose(): Promise<void> {
-		if (!this._disposed) {
-			if (!this._disposingPromise) {
-				this._disposingPromise = this.onDispose();
-			}
-			return this._disposingPromise.then(() => {
-				this._disposed = true;
-				delete this._disposingPromise;
-			});
-		}
-		return Promise.resolve();
-	}
-
-	protected abstract onDispose(): Promise<void>;
-
-	protected verifyDestroy() {
-		if (this.disposed || this.disposing) {
-			throw new Error("Wrong operation on disposed object");
-		}
-	}
-}
-
-export abstract class InternalLimitSyncBase extends Disposable implements InternalLimit {
+export abstract class InternalLimitSyncBase implements InternalLimit {
 	private readonly _listeners: Array<(remainTokens: number) => void> = [];
 	public abstract get availableTokens(): number;
 	public abstract get maxTokens(): number;
@@ -58,6 +28,6 @@ export abstract class InternalLimitSyncBase extends Disposable implements Intern
 
 export class AssertError extends Error { }
 
-export function throwConfigurationError(msg: string): never {
+export function throwLimitConfigurationError(msg: string): never {
 	throw new Error(`Wrong limit options: ${msg}`);
 }
