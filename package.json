@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
@@ -24,7 +24,7 @@
 		"@types/node": "^10.12.10",
 		"@types/sinon": "^7.0.3",
 		"@zxnode/build": "0.0.30",
-		"ptask.js": "0.0.6",
+		"ptask.js": "0.0.7",
 		"sinon": "^7.2.2"
 	},
 	"keywords": [],

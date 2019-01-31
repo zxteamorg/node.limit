@@ -1,4 +1,4 @@
-import { DisposableLike } from "@zxteam/contract";
+import { CancellationTokenLike, DisposableLike } from "@zxteam/contract";
 
 export class LimitError extends Error {
 }
@@ -25,7 +25,9 @@ export interface Limit extends DisposableLike {
 	readonly availableTokens: number;
 	readonly maxTokens: number;
 	accrueTokenImmediately(): LimitToken;
+	accrueTokenLazy(cancellationToken: CancellationTokenLike): Promise<LimitToken>;
 	accrueTokenLazy(timeout: number): Promise<LimitToken>;
+	accrueTokenLazy(cancellationToken: CancellationTokenLike, cb: TokenLazyCallback): void;
 	accrueTokenLazy(timeout: number, cb: TokenLazyCallback): void;
 	//exec<T>(accrueTokenTimeout: number, job: () => T | Promise<T>): T;
 	//exec<T>(accrueTokenTimeout: number, job: () => Promise<T>): Promise<T>;
