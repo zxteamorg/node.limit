@@ -55,6 +55,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 	const innerLimits = buildInnerLimits(opts);
 	const busyLimits: Array<InternalLimit> = [];
 	const waitForTokenCallbacks: Array<[TokenLazyCallback, any]> = [];
+	let disposing = false;
 
 	function onBusyLimitsReleased() {
 		while (waitForTokenCallbacks.length > 0) {
@@ -73,6 +74,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 
 	function _accrueAggregatedToken(): LimitToken | null {
 		if (busyLimits.length > 0) { return null; }
+		if (disposing) { return null; }
 		const innerTokens: Array<LimitToken> = [];
 		for (let innerLimitIndex = 0; innerLimitIndex < innerLimits.length; innerLimitIndex++) {
 			const innerLimit = innerLimits[innerLimitIndex];
@@ -105,6 +107,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 	}
 
 	function accrueTokenImmediately(): LimitToken {
+		if (disposing) { throw new Error("Wrong operation on disposed object"); }
 		const aggregatedToken = _accrueAggregatedToken();
 		if (aggregatedToken != null) {
 			return aggregatedToken;
@@ -144,6 +147,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 	}
 
 	function accrueTokenLazyOverrides(...args: Array<any>): any {
+		if (disposing) { throw new Error("Wrong operation on disposed object"); }
 		if (args.length === 1) {
 			const possibleTimeout = args[0];
 			if (typeof possibleTimeout === "number") { return accrueTokenLazyPromise(possibleTimeout); }
@@ -158,6 +162,14 @@ export function limitFactory(opts: Limit.Opts): Limit {
 	}
 
 	async function dispose(): Promise<void> {
+		disposing = true;
+		waitForTokenCallbacks.slice().forEach(waitForTokenCallback => {
+			const tupleIndex = waitForTokenCallbacks.indexOf(waitForTokenCallback);
+			if (tupleIndex !== -1) { waitForTokenCallbacks.splice(tupleIndex, 1); }
+			const [cb, timer] = waitForTokenCallback;
+			clearTimeout(timer);
+			cb(new LimitError(`Timeout: Token was not accrued due disposing`));
+		});
 		await Promise.all(innerLimits.map(il => il.dispose()));
 	}
 

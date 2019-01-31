@@ -2,7 +2,7 @@ import { assert } from "chai";
 
 import { Task } from "ptask.js";
 
-import { limitFactory, LimitToken } from "../src";
+import { limitFactory, LimitToken, LimitError } from "../src";
 
 async function nextTick() {
 	return new Promise(r => process.nextTick(r));
@@ -64,6 +64,68 @@ describe("0.0.4", function () {
 			assert.isFalse(limitDisposeTask.isCompleted, "Disposing process should NOT completed before next tick");
 			await nextTick();
 			assert.isTrue(limitDisposeTask.isCompleted, "Disposing process should completed due no any tokens in use.");
+		} catch (e) {
+			await limit.dispose();
+			throw e;
+		}
+	});
+});
+describe("0.0.5", function () {
+	it.only("dispose() should block flow while use any tokens (in lazy mode)", async function () {
+		const limit = limitFactory({
+			perMinute: 3,
+			perHour: 50,
+			parallel: 2
+		});
+
+		let limitToken1Task: Task<LimitToken>;
+		let limitToken2Task: Task<LimitToken>;
+		let limitToken3Task: Task<LimitToken>;
+		let limitToken4Task: Task<LimitToken>;
+		try {
+			limitToken1Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+			assert.isFalse(limitToken1Task.isCompleted);
+			await Task.sleep(5);
+			assert.isTrue(limitToken1Task.isCompletedSuccessfully);
+			limitToken1Task.result.commit(); // force to start timers in InternalTimespanLimit
+
+
+			limitToken2Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+			await Task.sleep(5);
+			assert.isTrue(limitToken2Task.isCompletedSuccessfully);
+
+			limitToken3Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+			await Task.sleep(5);
+			assert.isTrue(limitToken3Task.isCompletedSuccessfully);
+
+			limitToken4Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+			await Task.sleep(5);
+			assert.isFalse(limitToken4Task.isCompleted);
+
+			let disposing = false;
+			const limitDisposeTask = new Task<void>(() => {
+				disposing = true;
+				return limit.dispose();
+			}).start();
+
+			assert.isFalse(disposing, "Disposing process should NOT started before next tick");
+			await Task.sleep(5);
+			assert.isTrue(disposing, "Disposing process should started before next tick");
+			assert.isFalse(limitDisposeTask.isCompleted,
+				"Disposing process should NOT completed while limitToken2, limitToken3 still in use and limitToken4 in lazy accuring");
+
+			limitToken2Task.result.commit();
+			limitToken3Task.result.commit();
+
+			assert.isFalse(limitDisposeTask.isCompleted, "Disposing process should NOT completed before next tick");
+			await Task.sleep(5);
+
+			assert.isTrue(limitToken4Task.isCompleted, "limitToken4Task should completed");
+			assert.isFalse(limitToken4Task.isCompletedSuccessfully, "limitToken4Task should completed as error");
+			assert.instanceOf(limitToken4Task.error, LimitError, "error of limitToken4Task should be LimitError");
+
+			assert.isTrue(limitDisposeTask.isCompletedSuccessfully, "Disposing process should completed due no any tokens in use.");
+
 		} catch (e) {
 			await limit.dispose();
 			throw e;
