@@ -157,10 +157,8 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		throw Error("Wrong arguments");
 	}
 
-	function dispose(): Promise<void> {
-		return Promise.all(innerLimits.map(il => il.dispose())).then(() => {
-			//
-		});
+	async function dispose(): Promise<void> {
+		await Promise.all(innerLimits.map(il => il.dispose()));
 	}
 
 	return {
