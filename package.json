@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
@@ -16,6 +16,10 @@
 		}
 	],
 	"license": "MIT",
+	"dependencies": {
+		"@zxteam/contract": "1.0.5",
+		"@zxteam/disposable": "1.0.2"
+	},
 	"devDependencies": {
 		"@types/node": "^10.12.10",
 		"@types/sinon": "^7.0.3",
@@ -33,7 +37,7 @@
 	"homepage": "https://github.com/zxteamorg/limit.js#readme",
 	"scripts": {
 		"build": "zxbuild clean dist",
-		"test": "nyc --exclude submodules --exclude test --reporter=lcov --reporter=text --reporter=text-summary mocha 'test/**/*.test.js' --recursive --timeout 10000"
+		"test": "nyc --exclude submodules --exclude test --reporter=lcov --reporter=text --reporter=text-summary mocha \"test/**/*.test.js\" --recursive --timeout 10000"
 	},
 	"private": true
 }

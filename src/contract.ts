@@ -1,3 +1,5 @@
+import { DisposableLike } from "@zxteam/contract";
+
 export class LimitError extends Error {
 }
 export interface LimitToken {
@@ -19,7 +21,7 @@ export namespace Limit {
 	}
 }
 
-export interface Limit {
+export interface Limit extends DisposableLike {
 	readonly availableTokens: number;
 	readonly maxTokens: number;
 	accrueTokenImmediately(): LimitToken;

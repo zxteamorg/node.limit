@@ -38,7 +38,7 @@
 				"10000",
 				"--colors",
 				"--debug-brk",
-				"test/**/*.js"
+				"test/**/*.test.js"
 			],
 			"cwd": "${workspaceRoot}",
 			"env": {

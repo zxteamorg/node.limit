@@ -51,7 +51,7 @@ function buildInnerLimits(opts: Limit.Opts): Array<InternalLimit> {
 	return innerLimits;
 }
 
-export function LimitFactory(opts: Limit.Opts): Limit {
+export function limitFactory(opts: Limit.Opts): Limit {
 	const innerLimits = buildInnerLimits(opts);
 	const busyLimits: Array<InternalLimit> = [];
 	const waitForTokenCallbacks: Array<[TokenLazyCallback, any]> = [];
@@ -157,6 +157,12 @@ export function LimitFactory(opts: Limit.Opts): Limit {
 		throw Error("Wrong arguments");
 	}
 
+	function dispose(): Promise<void> {
+		return Promise.all(innerLimits.map(il => il.dispose())).then(() => {
+			//
+		});
+	}
+
 	return {
 		get maxTokens() {
 			return Math.min(...innerLimits.map(f => f.maxTokens));
@@ -165,8 +171,9 @@ export function LimitFactory(opts: Limit.Opts): Limit {
 			return Math.min(...innerLimits.map(f => f.availableTokens));
 		},
 		accrueTokenImmediately,
-		accrueTokenLazy: accrueTokenLazyOverrides
+		accrueTokenLazy: accrueTokenLazyOverrides,
+		dispose
 	};
 }
 
-export default LimitFactory;
+export default limitFactory;

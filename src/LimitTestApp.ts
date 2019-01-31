@@ -1,4 +1,4 @@
-import { LimitFactory } from "./index";
+import { limitFactory } from "./index";
 import { Deferred } from "./internal/misc";
 import { InternalParallelLimit } from "./internal/InternalParallelLimit";
 import { InternalTimespanLimit } from "./internal/InternalTimespanLimit";
@@ -92,7 +92,7 @@ async function InternalTimespanLimitSyncTest() {
 }
 
 async function LimitFactoryViaPromiseTest() {
-	const limit = LimitFactory({
+	const limit = limitFactory({
 		parallel: 2,
 		perSecond: 5,
 		perMinute: 30,
@@ -122,7 +122,7 @@ async function LimitFactoryViaPromiseTest() {
 }
 
 async function LimitFactoryViaCallableTest() {
-	const limit = LimitFactory({
+	const limit = limitFactory({
 		perSecond: 15
 		,
 		perMinute: 300
@@ -170,7 +170,7 @@ async function LimitFactoryViaCallableTest() {
 }
 
 async function LimitFactoryAccrueWithTimeoutTest() {
-	const limit = LimitFactory({
+	const limit = limitFactory({
 		perSecond: 3,
 		perMinute: 5
 	});

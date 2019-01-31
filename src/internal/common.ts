@@ -1,14 +1,18 @@
+import { DisposableLike } from "@zxteam/contract";
+import { Disposable } from "@zxteam/disposable";
+
 import { LimitToken } from "../contract";
 
-export interface InternalLimit {
+export interface InternalLimit extends DisposableLike {
 	readonly availableTokens: number;
 	readonly maxTokens: number;
 	accrueToken(): LimitToken;
 	addReleaseTokenListener(cb: (availableTokens: number) => void): void;
 	removeReleaseTokenListener(cb: (availableTokens: number) => void): void;
+	dispose(): Promise<void>;
 }
 
-export abstract class InternalLimitSyncBase implements InternalLimit {
+export abstract class InternalLimitSyncBase extends Disposable implements InternalLimit {
 	private readonly _listeners: Array<(remainTokens: number) => void> = [];
 	public abstract get availableTokens(): number;
 	public abstract get maxTokens(): number;

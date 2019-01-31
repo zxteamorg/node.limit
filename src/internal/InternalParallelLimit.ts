@@ -14,14 +14,17 @@ export class InternalParallelLimit extends InternalLimitSyncBase {
 	}
 
 	public get availableTokens(): number {
+		super.verifyNotDisposed();
 		return this._maxTokens - this._activeTokenDefers.length;
 	}
 
 	public get maxTokens(): number {
+		super.verifyNotDisposed();
 		return this._maxTokens;
 	}
 
 	public accrueToken(): LimitToken {
+		super.verifyNotDisposed();
 		if (this.availableTokens === 0) { throw new LimitError("No any available tokens"); }
 		let defer: Deferred | null = Deferred.create<void>();
 		this._activeTokenDefers.push(defer);
@@ -46,5 +49,9 @@ export class InternalParallelLimit extends InternalLimitSyncBase {
 			}
 		};
 		return token as LimitToken;
+	}
+
+	protected async onDispose(): Promise<void> {
+		await Promise.all(this._activeTokenDefers);
 	}
 }
