@@ -25,10 +25,16 @@ export interface Limit extends DisposableLike {
 	readonly availableTokens: number;
 	readonly maxTokens: number;
 	accrueTokenImmediately(): LimitToken;
-	accrueTokenLazy(cancellationToken: CancellationTokenLike): Promise<LimitToken>;
-	accrueTokenLazy(timeout: number): Promise<LimitToken>;
-	accrueTokenLazy(cancellationToken: CancellationTokenLike, cb: TokenLazyCallback): void;
+
 	accrueTokenLazy(timeout: number, cb: TokenLazyCallback): void;
+	accrueTokenLazy(timeout: number): Promise<LimitToken>;
+
+	accrueTokenLazy(cancellationToken: CancellationTokenLike, cb: TokenLazyCallback): void;
+	accrueTokenLazy(cancellationToken: CancellationTokenLike): Promise<LimitToken>;
+
+	accrueTokenLazy(timeout: number, cancellationToken: CancellationTokenLike, cb: TokenLazyCallback): void;
+	accrueTokenLazy(timeout: number, cancellationToken: CancellationTokenLike): Promise<LimitToken>;
+
 	//exec<T>(accrueTokenTimeout: number, job: () => T | Promise<T>): T;
 	//exec<T>(accrueTokenTimeout: number, job: () => Promise<T>): Promise<T>;
 	//addReleaseTokenListener(cb: (availableTokens: number) => void): void;
