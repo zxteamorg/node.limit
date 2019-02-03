@@ -87,17 +87,17 @@ describe("Regression", function () {
 				limitToken1Task = new Task(() => limit.accrueTokenLazy(10000)).start();
 				assert.isFalse(limitToken1Task.isCompleted);
 				await Task.sleep(5);
-				assert.isTrue(limitToken1Task.isCompletedSuccessfully);
+				assert.isTrue(limitToken1Task.isSuccessed);
 				limitToken1Task.result.commit(); // force to start timers in InternalTimespanLimit
 
 
 				limitToken2Task = new Task(() => limit.accrueTokenLazy(10000)).start();
 				await Task.sleep(5);
-				assert.isTrue(limitToken2Task.isCompletedSuccessfully);
+				assert.isTrue(limitToken2Task.isSuccessed);
 
 				limitToken3Task = new Task(() => limit.accrueTokenLazy(10000)).start();
 				await Task.sleep(5);
-				assert.isTrue(limitToken3Task.isCompletedSuccessfully);
+				assert.isTrue(limitToken3Task.isSuccessed);
 
 				limitToken4Task = new Task(() => limit.accrueTokenLazy(10000)).start();
 				await Task.sleep(5);
@@ -122,10 +122,10 @@ describe("Regression", function () {
 				await Task.sleep(5);
 
 				assert.isTrue(limitToken4Task.isCompleted, "limitToken4Task should completed");
-				assert.isFalse(limitToken4Task.isCompletedSuccessfully, "limitToken4Task should completed as error");
+				assert.isFalse(limitToken4Task.isSuccessed, "limitToken4Task should completed as error");
 				assert.instanceOf(limitToken4Task.error, LimitError, "error of limitToken4Task should be LimitError");
 
-				assert.isTrue(limitDisposeTask.isCompletedSuccessfully, "Disposing process should completed due no any tokens in use.");
+				assert.isTrue(limitDisposeTask.isSuccessed, "Disposing process should completed due no any tokens in use.");
 
 			} catch (e) {
 				await limit.dispose();

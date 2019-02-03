@@ -23,8 +23,8 @@ describe("Generic tests", function () {
 			limitToken1Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
 			limitToken2Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
 			await Task.sleep(5);
-			assert.isTrue(limitToken1Task.isCompletedSuccessfully);
-			assert.isTrue(limitToken2Task.isCompletedSuccessfully);
+			assert.isTrue(limitToken1Task.isSuccessed);
+			assert.isTrue(limitToken2Task.isSuccessed);
 
 			try {
 				limitToken3Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
@@ -41,8 +41,8 @@ describe("Generic tests", function () {
 
 				assert.isTrue(limitToken3Task.isCompleted);
 				assert.isTrue(limitToken4Task.isCompleted);
-				assert.isFalse(limitToken3Task.isCompletedSuccessfully);
-				assert.isFalse(limitToken4Task.isCompletedSuccessfully);
+				assert.isFalse(limitToken3Task.isSuccessed);
+				assert.isFalse(limitToken4Task.isSuccessed);
 
 				assert.isTrue(limitToken3Task.isCancelled);
 				assert.isTrue(limitToken4Task.isCancelled);
@@ -72,8 +72,8 @@ describe("Generic tests", function () {
 			limitToken1Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
 			limitToken2Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
 			await Task.sleep(5);
-			assert.isTrue(limitToken1Task.isCompletedSuccessfully);
-			assert.isTrue(limitToken2Task.isCompletedSuccessfully);
+			assert.isTrue(limitToken1Task.isSuccessed);
+			assert.isTrue(limitToken2Task.isSuccessed);
 			try {
 				limitToken3Task = new Task(() => limit.accrueTokenLazy(1000, cts.token)).start();
 				limitToken4Task = new Task(() => limit.accrueTokenLazy(1000, cts.token)).start();
@@ -89,8 +89,8 @@ describe("Generic tests", function () {
 
 				assert.isTrue(limitToken3Task.isCompleted);
 				assert.isTrue(limitToken4Task.isCompleted);
-				assert.isFalse(limitToken3Task.isCompletedSuccessfully);
-				assert.isFalse(limitToken4Task.isCompletedSuccessfully);
+				assert.isFalse(limitToken3Task.isSuccessed);
+				assert.isFalse(limitToken4Task.isSuccessed);
 
 				assert.isTrue(limitToken3Task.isCancelled);
 				assert.isTrue(limitToken4Task.isCancelled);
@@ -120,8 +120,8 @@ describe("Generic tests", function () {
 			limitToken1Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
 			limitToken2Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
 			await Task.sleep(5);
-			assert.isTrue(limitToken1Task.isCompletedSuccessfully);
-			assert.isTrue(limitToken2Task.isCompletedSuccessfully);
+			assert.isTrue(limitToken1Task.isSuccessed);
+			assert.isTrue(limitToken2Task.isSuccessed);
 
 			try {
 				limitToken3Task = new Task(() => limit.accrueTokenLazy(50, cts.token)).start();
@@ -129,8 +129,8 @@ describe("Generic tests", function () {
 				await Task.sleep(100);
 				assert.isTrue(limitToken3Task.isCompleted, "limitToken3Task should complete");
 				assert.isTrue(limitToken4Task.isCompleted, "limitToken4Task should complete");
-				assert.isFalse(limitToken3Task.isCompletedSuccessfully, "limitToken3Task should complete with failure");
-				assert.isFalse(limitToken4Task.isCompletedSuccessfully, "limitToken4Task should complete with failure");
+				assert.isFalse(limitToken3Task.isSuccessed, "limitToken3Task should complete with failure");
+				assert.isFalse(limitToken4Task.isSuccessed, "limitToken4Task should complete with failure");
 				assert.instanceOf(limitToken3Task.error, Error, "limitToken3Task should complete with Timeout error");
 				assert.instanceOf(limitToken4Task.error, Error, "limitToken4Task should complete with Timeout error");
 			} finally {

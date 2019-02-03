@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
@@ -17,14 +17,14 @@
 	],
 	"license": "MIT",
 	"dependencies": {
-		"@zxteam/contract": "1.0.5",
-		"@zxteam/disposable": "1.0.2"
+		"@zxteam/contract": "^1.0.6",
+		"@zxteam/disposable": "^1.0.3"
 	},
 	"devDependencies": {
-		"@types/node": "^10.12.10",
+		"@types/node": "^10.12.21",
 		"@types/sinon": "^7.0.3",
 		"@zxnode/build": "0.0.30",
-		"ptask.js": "0.0.8",
+		"ptask.js": "^0.0.9",
 		"sinon": "^7.2.2"
 	},
 	"keywords": [],
