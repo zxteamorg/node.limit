@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "0.0.9",
+	"version": "1.0.0",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
