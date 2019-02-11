@@ -24,7 +24,7 @@
 		"@types/node": "^10.12.24",
 		"@types/sinon": "^7.0.3",
 		"@zxnode/build": "0.0.30",
-		"ptask.js": "^0.0.9",
+		"ptask.js": "^2.0.0",
 		"sinon": "^7.2.2"
 	},
 	"keywords": [],
