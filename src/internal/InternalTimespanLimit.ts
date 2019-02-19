@@ -17,7 +17,11 @@ export class InternalTimespanLimit extends InternalLimitSyncBase {
 			clearTimeoutFunc: (handle?: number) => void,
 			setTimeoutFunc: (handler: TimerHandler, timeout?: number) => number
 		}
-			= { clearTimeoutFunc: clearTimeout, setTimeoutFunc: setTimeout }) {
+			= {
+				clearTimeoutFunc: (...args) => clearTimeout(...args),
+				setTimeoutFunc: (...args) => setTimeout(...args)
+			}
+	) {
 		super();
 		this._maxTokens = hitCount;
 		this._delay = delay;
