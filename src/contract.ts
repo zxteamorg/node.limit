@@ -20,8 +20,8 @@ export namespace Limit {
 		parallel?: number;
 	}
 
-	export function isLimitOpts(probablyOpts: Opts): probablyOpts is Opts {
-		if (probablyOpts !== undefined) {
+	export function isLimitOpts(probablyOpts: any): probablyOpts is Opts {
+		if (probablyOpts !== undefined && probablyOpts !== null) {
 			if (typeof probablyOpts === "object") {
 				let hasAnyFriendlyField = false;
 				if ("perSecond" in probablyOpts) {
@@ -67,7 +67,7 @@ export namespace Limit {
 		return false;
 	}
 
-	export function ensureLimitOpts(probablyOpts: Opts): Opts {
+	export function ensureLimitOpts(probablyOpts: any): Opts {
 		if (isLimitOpts(probablyOpts)) {
 			return probablyOpts;
 		}

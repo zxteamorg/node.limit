@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
@@ -25,7 +25,8 @@
 		"@types/sinon": "^7.0.3",
 		"@zxnode/build": "0.0.30",
 		"ptask.js": "^2.0.0",
-		"sinon": "^7.2.2"
+		"sinon": "^7.2.2",
+		"source-map-support": "^0.5.10"
 	},
 	"keywords": [],
 	"repository": {
@@ -38,7 +39,8 @@
 	"homepage": "https://github.com/zxteamorg/limit.js#readme",
 	"scripts": {
 		"build": "zxbuild clean dist",
-		"test": "nyc --exclude submodules --exclude test --reporter=lcov --reporter=text --reporter=text-summary mocha \"test/**/*.test.js\" --recursive --timeout 10000"
+		"test": "nyc --exclude submodules --exclude test --reporter=lcov --reporter=text --reporter=text-summary mocha --require source-map-support/register --recursive --timeout 10000 \"test/**/*.test.js\"",
+		"test:only": "mocha --require source-map-support/register --recursive --timeout 10000 \"test/**/*.test.js\""
 	},
 	"private": true
 }
