@@ -19,6 +19,60 @@ export namespace Limit {
 		};
 		parallel?: number;
 	}
+
+	export function isLimitOpts(probablyOpts: Opts): probablyOpts is Opts {
+		if (probablyOpts !== undefined) {
+			if (typeof probablyOpts === "object") {
+				let hasAnyFriendlyField = false;
+				if ("perSecond" in probablyOpts) {
+					if (!(probablyOpts.perSecond !== undefined && Number.isInteger(probablyOpts.perSecond))) {
+						return false;
+					}
+					hasAnyFriendlyField = true;
+				}
+				if ("perMinute" in probablyOpts) {
+					if (!(probablyOpts.perMinute !== undefined && Number.isInteger(probablyOpts.perMinute))) {
+						return false;
+					}
+					hasAnyFriendlyField = true;
+				}
+				if ("perHour" in probablyOpts) {
+					if (!(probablyOpts.perHour !== undefined && Number.isInteger(probablyOpts.perHour))) {
+						return false;
+					}
+					hasAnyFriendlyField = true;
+				}
+				if ("perTimespan" in probablyOpts) {
+					if (!(
+						probablyOpts.perTimespan !== undefined
+						&& Number.isInteger(probablyOpts.perTimespan.count)
+						&& Number.isInteger(probablyOpts.perTimespan.delay))
+					) {
+						return false;
+					}
+					hasAnyFriendlyField = true;
+				}
+				if ("parallel" in probablyOpts) {
+					if (!(probablyOpts.parallel !== undefined && Number.isInteger(probablyOpts.parallel))) {
+						return false;
+					}
+					hasAnyFriendlyField = true;
+				}
+				if (hasAnyFriendlyField) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	export function ensureLimitOpts(probablyOpts: Opts): Opts {
+		if (isLimitOpts(probablyOpts)) {
+			return probablyOpts;
+		}
+		throw new Error("Wrong argument for Limit Opts");
+	}
 }
 
 export interface Limit extends DisposableLike {
