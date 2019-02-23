@@ -52,140 +52,154 @@ describe("InternalTimespanLimit tests", function () {
 
 	it("Should be able to instance and destroy", async function () {
 		const mylimit = new InternalTimespanLimit(1000, 2);
-		mylimit.accrueToken().commit();
+		mylimit.accrueToken(1).commit();
 	});
 	it("Should be equal maxTokens to hitCount", async function () {
-		assert.equal(limit.maxTokens, 2);
+		assert.equal(limit.maxWeight, 2);
 	});
 	it("Should NOT fail on commit timeout with broken _timers array", async function () {
-		const token = limit.accrueToken();
+		const token = limit.accrueToken(1);
 		token.commit();
 		(limit as any)._timers = [];
 		timeoutStub.timeForward(1000);
 	});
 	it("Should get 2 tokens and block 3-rd token", async function () {
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 
-		const limitToken0 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		const limitToken0 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
-		const limitToken1 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 0);
+		const limitToken1 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 0);
 
 		let expectedError;
 		try {
-			const limitToken2 = limit.accrueToken();
+			const limitToken2 = limit.accrueToken(1);
 		} catch (e) {
 			expectedError = e;
 		}
 		assert.instanceOf(expectedError, LimitError);
 	});
 	it("Should get 2 tokens and commit 2 tokens", async function () {
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 
-		const limitToken0 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		const limitToken0 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
-		const limitToken1 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 0);
+		const limitToken1 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 0);
 
 		limitToken0.commit();
-		assert.equal(limit.availableTokens, 0);
+		assert.equal(limit.availableWeight, 0);
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 1);
+		assert.equal(limit.availableWeight, 1);
 
 		limitToken1.commit();
-		assert.equal(limit.availableTokens, 1);
+		assert.equal(limit.availableWeight, 1);
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 	});
 	it("Should get 2 tokens and rollback 2 tokens", async function () {
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 
-		const limitToken0 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		const limitToken0 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
-		const limitToken1 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 0);
+		const limitToken1 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 0);
 
 		limitToken0.rollback();
-		assert.equal(limit.availableTokens, 1);
+		assert.equal(limit.availableWeight, 1);
 
 		limitToken1.rollback();
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 	});
 	it("Should get 2 tokens and get another 2 tokens", async function () {
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 
-		const limitToken0 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		const limitToken0 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
-		const limitToken1 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 0);
+		const limitToken1 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 0);
 
 		limitToken0.commit();
-		assert.equal(limit.availableTokens, 0);
+		assert.equal(limit.availableWeight, 0);
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 1);
+		assert.equal(limit.availableWeight, 1);
 
 		limitToken1.rollback();
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 
-		const limitToken2 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		const limitToken2 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
-		const limitToken3 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 0);
+		const limitToken3 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 0);
+	});
+	it("Should get 2 tokens at once", async function () {
+		assert.equal(limit.availableWeight, 2);
+
+		const limitToken0 = limit.accrueToken(2);
+		assert.equal(limit.availableWeight, 0);
+
+		limitToken0.commit();
+		assert.equal(limit.availableWeight, 0);
+		timeoutStub.timeForward(1000);
+		assert.equal(limit.availableWeight, 2);
+
+		const limitToken2 = limit.accrueToken(2);
+		assert.equal(limit.availableWeight, 0);
 	});
 	it("Should NOT decrement availableTokens on multiple call commit on same token", async function () {
-		assert.equal(limit.availableTokens, 2);
-		const limitToken0 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		assert.equal(limit.availableWeight, 2);
+		const limitToken0 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
 		limitToken0.commit();
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 		limitToken0.commit();
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 		limitToken0.commit();
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 	});
 	it("Should NOT decrement availableTokens on multiple call rollback on same token", async function () {
-		assert.equal(limit.availableTokens, 2);
-		const limitToken0 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		assert.equal(limit.availableWeight, 2);
+		const limitToken0 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
 		limitToken0.rollback();
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 		limitToken0.rollback();
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 		limitToken0.rollback();
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 	});
 	it("Should NOT decrement availableTokens on multiple call commit+rollback on same token", async function () {
-		assert.equal(limit.availableTokens, 2);
-		const limitToken0 = limit.accrueToken();
-		assert.equal(limit.availableTokens, 1);
+		assert.equal(limit.availableWeight, 2);
+		const limitToken0 = limit.accrueToken(1);
+		assert.equal(limit.availableWeight, 1);
 
 		limitToken0.commit();
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 		limitToken0.rollback();
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 		limitToken0.commit();
 		timeoutStub.timeForward(1000);
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 		limitToken0.rollback();
-		assert.equal(limit.availableTokens, 2);
+		assert.equal(limit.availableWeight, 2);
 	});
 	it("Should fire callback on commit", async function () {
 		const listenerSpy = spy();
 		limit.addReleaseTokenListener(listenerSpy);
 
-		const limitToken0 = limit.accrueToken();
-		const limitToken1 = limit.accrueToken();
+		const limitToken0 = limit.accrueToken(1);
+		const limitToken1 = limit.accrueToken(1);
 
 		assert.isFalse(listenerSpy.called, "Listener should NOT call before commit");
 
@@ -203,8 +217,8 @@ describe("InternalTimespanLimit tests", function () {
 		const listenerSpy = spy();
 		limit.addReleaseTokenListener(listenerSpy);
 
-		const limitToken0 = limit.accrueToken();
-		const limitToken1 = limit.accrueToken();
+		const limitToken0 = limit.accrueToken(1);
+		const limitToken1 = limit.accrueToken(1);
 
 		assert.isFalse(listenerSpy.called, "Listener should NOT call before commit");
 

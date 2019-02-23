@@ -1,8 +1,8 @@
-import { LimitToken, LimitError } from "../contract";
+import { LimitToken, LimitError, Limit } from "../contract";
 import { InternalLimitSyncBase } from "./common";
-import { Deferred } from "./misc";
+import { TokenDeferred } from "./misc";
 
-type LimitTokenDeferred = Deferred & { finalize: () => void, finalizing: boolean };
+type LimitTokenDeferred = TokenDeferred & { finalize: () => void, finalizing: boolean };
 
 export class InternalTimespanLimit extends InternalLimitSyncBase {
 	private readonly _maxTokens: number;
@@ -30,24 +30,24 @@ export class InternalTimespanLimit extends InternalLimitSyncBase {
 		this._activeTokenDefers = [];
 	}
 
-	public get availableTokens(): number {
+	public get availableWeight(): number {
 		if (super.disposed) { throw new Error("Wrong operation on disposed object"); }
-		return this._maxTokens - this._activeTokenDefers.length;
+		return this._maxTokens - this._activeTokenDefers.reduce((p, c) => p + c.weight, 0);
 	}
 
-	public get maxTokens(): number {
+	public get maxWeight(): number {
 		if (super.disposed) { throw new Error("Wrong operation on disposed object"); }
 		return this._maxTokens;
 	}
 
-	public accrueToken(): LimitToken {
+	public accrueToken(weight: Limit.Weight): LimitToken {
 		super.verifyNotDisposed();
-		if (this.availableTokens === 0) { throw new LimitError("No any available tokens"); }
+		if (this.availableWeight < weight) { throw new LimitError("No any available tokens"); }
 
 		let defer: LimitTokenDeferred | null = null;
 		{ // local scope
 			const realDefer: LimitTokenDeferred = {
-				...Deferred.create<void>(),
+				...TokenDeferred.create<void>(weight),
 				finalize: () => {
 					realDefer.resolve();
 					const index = this._activeTokenDefers.indexOf(realDefer);

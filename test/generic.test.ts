@@ -2,7 +2,7 @@ import { assert } from "chai";
 
 import { Task } from "ptask.js";
 
-import { limitFactory, LimitToken, LimitError } from "../src";
+import { limitFactory, LimitToken } from "../src";
 
 describe("Generic tests", function () {
 	it("Should be able to cancel lazy accuring via Cancellation Token", async function () {
