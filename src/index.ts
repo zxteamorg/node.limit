@@ -89,7 +89,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		const innerTokens: Array<LimitToken> = [];
 		for (let innerLimitIndex = 0; innerLimitIndex < innerLimits.length; innerLimitIndex++) {
 			const innerLimit = innerLimits[innerLimitIndex];
-			if (innerLimit.availableWeight === 0) {
+			if (innerLimit.availableWeight  < weight) {
 				busyLimits.push(innerLimit);
 			} else {
 				innerTokens.push(innerLimit.accrueToken(weight));
@@ -349,10 +349,10 @@ export function limitFactory(opts: Limit.Opts): Limit {
 	}
 
 	return {
-		get maxTokens() {
+		get maxWeight() {
 			return Math.min(...innerLimits.map(f => f.maxWeight));
 		},
-		get availableTokens() {
+		get availableWeight() {
 			return Math.min(...innerLimits.map(f => f.availableWeight));
 		},
 		accrueTokenImmediately,

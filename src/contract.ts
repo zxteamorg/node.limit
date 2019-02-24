@@ -78,8 +78,8 @@ export namespace Limit {
 }
 
 export interface Limit extends DisposableLike {
-	readonly availableTokens: number;
-	readonly maxTokens: number;
+	readonly availableWeight: number;
+	readonly maxWeight: number;
 
 	/**
 	 * @param tokenWeight default: 1
