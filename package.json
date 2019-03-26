@@ -1,6 +1,6 @@
 {
 	"name": "limit.js",
-	"version": "2.2.0",
+	"version": "3.0.2",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
@@ -12,21 +12,23 @@
 	"contributors": [
 		{
 			"name": "Serg Zgama",
-			"email": "serg.zgama@zxteam.org"
+			"email": "serhii.zghama@zxteam.org"
 		}
 	],
 	"license": "MIT",
 	"dependencies": {
-		"@zxteam/contract": "^2.0.0",
-		"@zxteam/disposable": "^2.0.0"
+		"@zxteam/contract": "^3.0.2",
+		"@zxteam/disposable": "^3.0.2",
+		"ptask.js": "^3.0.2"
 	},
 	"devDependencies": {
-		"@types/node": "^10.12.24",
-		"@types/sinon": "^7.0.6",
-		"@zxnode/build": "0.0.30",
-		"ptask.js": "^2.0.1",
-		"sinon": "^7.2.4",
-		"source-map-support": "^0.5.10"
+		"@types/node": "^11.11.7",
+		"@types/sinon": "^7.0.10",
+		"@zxnode/build": "0.0.32",
+		"sinon": "^7.3.0"
+	},
+	"engines": {
+		"node": ">=11"
 	},
 	"keywords": [],
 	"repository": {

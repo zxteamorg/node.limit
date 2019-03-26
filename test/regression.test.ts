@@ -47,10 +47,10 @@ describe("Regression", function () {
 				limitToken1.commit(); // force to start timers in InternalTimespanLimit
 
 				let disposing = false;
-				const limitDisposeTask = new Task<void>(() => {
+				const limitDisposeTask = Task.run<void>(() => {
 					disposing = true;
 					return limit.dispose();
-				}).start();
+				});
 
 				assert.isFalse(disposing, "Disposing process should NOT started before next tick");
 				await nextTick();
@@ -84,30 +84,30 @@ describe("Regression", function () {
 			let limitToken3Task: Task<LimitToken>;
 			let limitToken4Task: Task<LimitToken>;
 			try {
-				limitToken1Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+				limitToken1Task = Task.run(() => limit.accrueTokenLazy(10000));
 				assert.isFalse(limitToken1Task.isCompleted);
 				await Task.sleep(5);
 				assert.isTrue(limitToken1Task.isSuccessed);
 				limitToken1Task.result.commit(); // force to start timers in InternalTimespanLimit
 
 
-				limitToken2Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+				limitToken2Task = Task.run(() => limit.accrueTokenLazy(10000));
 				await Task.sleep(5);
 				assert.isTrue(limitToken2Task.isSuccessed);
 
-				limitToken3Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+				limitToken3Task = Task.run(() => limit.accrueTokenLazy(10000));
 				await Task.sleep(5);
 				assert.isTrue(limitToken3Task.isSuccessed);
 
-				limitToken4Task = new Task(() => limit.accrueTokenLazy(10000)).start();
+				limitToken4Task = Task.run(() => limit.accrueTokenLazy(10000));
 				await Task.sleep(5);
 				assert.isFalse(limitToken4Task.isCompleted);
 
 				let disposing = false;
-				const limitDisposeTask = new Task<void>(() => {
+				const limitDisposeTask = Task.run(() => {
 					disposing = true;
 					return limit.dispose();
-				}).start();
+				});
 
 				assert.isFalse(disposing, "Disposing process should NOT started before next tick");
 				await Task.sleep(5);

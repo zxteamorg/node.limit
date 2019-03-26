@@ -1,4 +1,4 @@
-import { CancellationTokenLike, DisposableLike } from "@zxteam/contract";
+import { CancellationToken, Disposable } from "@zxteam/contract";
 
 export class LimitError extends Error {
 }
@@ -77,7 +77,7 @@ export namespace Limit {
 	}
 }
 
-export interface Limit extends DisposableLike {
+export interface Limit extends Disposable {
 	readonly availableWeight: number;
 	readonly maxWeight: number;
 
@@ -88,18 +88,18 @@ export interface Limit extends DisposableLike {
 	accrueTokenImmediately(tokenWeight: Limit.Weight): LimitToken;
 
 	accrueTokenLazy(timeout: number): Promise<LimitToken>;	// 1
-	accrueTokenLazy(cancellationToken: CancellationTokenLike): Promise<LimitToken>; // 2
+	accrueTokenLazy(cancellationToken: CancellationToken): Promise<LimitToken>; // 2
 
 	accrueTokenLazy(timeout: number, cb: TokenLazyCallback): void; // 3
-	accrueTokenLazy(cancellationToken: CancellationTokenLike, cb: TokenLazyCallback): void; // 4
-	accrueTokenLazy(timeout: number, cancellationToken: CancellationTokenLike): Promise<LimitToken>; // 5
+	accrueTokenLazy(cancellationToken: CancellationToken, cb: TokenLazyCallback): void; // 4
+	accrueTokenLazy(timeout: number, cancellationToken: CancellationToken): Promise<LimitToken>; // 5
 	accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number): Promise<LimitToken>; // 6
 
-	accrueTokenLazy(timeout: number, cancellationToken: CancellationTokenLike, cb: TokenLazyCallback): void; // 7
+	accrueTokenLazy(timeout: number, cancellationToken: CancellationToken, cb: TokenLazyCallback): void; // 7
 	accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number, cb: TokenLazyCallback): void; // 8
-	accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number, cancellationToken: CancellationTokenLike): Promise<LimitToken>; // 9
+	accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number, cancellationToken: CancellationToken): Promise<LimitToken>; // 9
 
-	accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number, cancellationToken: CancellationTokenLike, cb: TokenLazyCallback): void; // 10
+	accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number, cancellationToken: CancellationToken, cb: TokenLazyCallback): void; // 10
 
 	//exec<T>(accrueTokenTimeout: number, job: () => T | Promise<T>): T;
 	//exec<T>(accrueTokenTimeout: number, job: () => Promise<T>): Promise<T>;

@@ -1,9 +1,8 @@
-import { DisposableLike } from "@zxteam/contract";
 import { Disposable } from "@zxteam/disposable";
 
 import { LimitToken, Limit } from "../contract";
 
-export interface InternalLimit extends DisposableLike {
+export interface InternalLimit {
 	readonly availableWeight: number;
 	readonly maxWeight: number;
 	accrueToken(weight: Limit.Weight): LimitToken;

@@ -20,15 +20,15 @@ describe("Generic tests", function () {
 		try {
 			const cts = Task.createCancellationTokenSource();
 
-			limitToken1Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
-			limitToken2Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
+			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
+			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			await Task.sleep(5);
 			assert.isTrue(limitToken1Task.isSuccessed);
 			assert.isTrue(limitToken2Task.isSuccessed);
 
 			try {
-				limitToken3Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
-				limitToken4Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
+				limitToken3Task = Task.run(() => limit.accrueTokenLazy(cts.token));
+				limitToken4Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 				await Task.sleep(5);
 				assert.isFalse(limitToken3Task.isCompleted);
 				assert.isFalse(limitToken4Task.isCompleted);
@@ -69,14 +69,14 @@ describe("Generic tests", function () {
 		try {
 			const cts = Task.createCancellationTokenSource();
 
-			limitToken1Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
-			limitToken2Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
+			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
+			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			await Task.sleep(5);
 			assert.isTrue(limitToken1Task.isSuccessed);
 			assert.isTrue(limitToken2Task.isSuccessed);
 			try {
-				limitToken3Task = new Task(() => limit.accrueTokenLazy(1000, cts.token)).start();
-				limitToken4Task = new Task(() => limit.accrueTokenLazy(1000, cts.token)).start();
+				limitToken3Task = Task.run(() => limit.accrueTokenLazy(1000, cts.token));
+				limitToken4Task = Task.run(() => limit.accrueTokenLazy(1000, cts.token));
 				await Task.sleep(5);
 				assert.isFalse(limitToken3Task.isCompleted);
 				assert.isFalse(limitToken4Task.isCompleted);
@@ -117,15 +117,15 @@ describe("Generic tests", function () {
 		try {
 			const cts = Task.createCancellationTokenSource();
 
-			limitToken1Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
-			limitToken2Task = new Task(() => limit.accrueTokenLazy(cts.token)).start();
+			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
+			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			await Task.sleep(5);
 			assert.isTrue(limitToken1Task.isSuccessed);
 			assert.isTrue(limitToken2Task.isSuccessed);
 
 			try {
-				limitToken3Task = new Task(() => limit.accrueTokenLazy(50, cts.token)).start();
-				limitToken4Task = new Task(() => limit.accrueTokenLazy(50, cts.token)).start();
+				limitToken3Task = Task.run(() => limit.accrueTokenLazy(50, cts.token));
+				limitToken4Task = Task.run(() => limit.accrueTokenLazy(50, cts.token));
 				await Task.sleep(100);
 				assert.isTrue(limitToken3Task.isCompleted, "limitToken3Task should complete");
 				assert.isTrue(limitToken4Task.isCompleted, "limitToken4Task should complete");
