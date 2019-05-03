@@ -1,3 +1,4 @@
+import * as zxteam from "@zxteam/contract";
 import { Disposable } from "@zxteam/disposable";
 
 import { LimitToken, Limit } from "../contract";
@@ -8,7 +9,7 @@ export interface InternalLimit {
 	accrueToken(weight: Limit.Weight): LimitToken;
 	addReleaseTokenListener(cb: (availableTokens: number) => void): void;
 	removeReleaseTokenListener(cb: (availableTokens: number) => void): void;
-	dispose(): Promise<void>;
+	dispose(): zxteam.Task<void>;
 }
 
 export abstract class InternalLimitSyncBase extends Disposable implements InternalLimit {

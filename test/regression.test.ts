@@ -1,6 +1,7 @@
+import * as zxteam from "@zxteam/contract";
 import { assert } from "chai";
 
-import { Task } from "ptask.js";
+import { Task } from "@zxteam/task";
 
 import { limitFactory, LimitToken, LimitError } from "../src";
 
@@ -49,7 +50,7 @@ describe("Regression", function () {
 				let disposing = false;
 				const limitDisposeTask = Task.run<void>(() => {
 					disposing = true;
-					return limit.dispose();
+					return limit.dispose().promise;
 				});
 
 				assert.isFalse(disposing, "Disposing process should NOT started before next tick");
@@ -79,10 +80,10 @@ describe("Regression", function () {
 				parallel: 2
 			});
 
-			let limitToken1Task: Task<LimitToken>;
-			let limitToken2Task: Task<LimitToken>;
-			let limitToken3Task: Task<LimitToken>;
-			let limitToken4Task: Task<LimitToken>;
+			let limitToken1Task: zxteam.Task<LimitToken>;
+			let limitToken2Task: zxteam.Task<LimitToken>;
+			let limitToken3Task: zxteam.Task<LimitToken>;
+			let limitToken4Task: zxteam.Task<LimitToken>;
 			try {
 				limitToken1Task = Task.run(() => limit.accrueTokenLazy(10000));
 				assert.isFalse(limitToken1Task.isCompleted);

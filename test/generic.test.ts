@@ -1,6 +1,7 @@
+import * as zxteam from "@zxteam/contract";
 import { assert } from "chai";
 
-import { Task } from "ptask.js";
+import { Task } from "@zxteam/task";
 
 import { limitFactory, LimitToken } from "../src";
 
@@ -12,10 +13,10 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: Task<LimitToken>;
-		let limitToken2Task: Task<LimitToken>;
-		let limitToken3Task: Task<LimitToken>;
-		let limitToken4Task: Task<LimitToken>;
+		let limitToken1Task: zxteam.Task<LimitToken>;
+		let limitToken2Task: zxteam.Task<LimitToken>;
+		let limitToken3Task: zxteam.Task<LimitToken>;
+		let limitToken4Task: zxteam.Task<LimitToken>;
 
 		try {
 			const cts = Task.createCancellationTokenSource();
@@ -61,10 +62,10 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: Task<LimitToken>;
-		let limitToken2Task: Task<LimitToken>;
-		let limitToken3Task: Task<LimitToken>;
-		let limitToken4Task: Task<LimitToken>;
+		let limitToken1Task: zxteam.Task<LimitToken>;
+		let limitToken2Task: zxteam.Task<LimitToken>;
+		let limitToken3Task: zxteam.Task<LimitToken>;
+		let limitToken4Task: zxteam.Task<LimitToken>;
 
 		try {
 			const cts = Task.createCancellationTokenSource();
@@ -109,10 +110,10 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: Task<LimitToken>;
-		let limitToken2Task: Task<LimitToken>;
-		let limitToken3Task: Task<LimitToken>;
-		let limitToken4Task: Task<LimitToken>;
+		let limitToken1Task: zxteam.Task<LimitToken>;
+		let limitToken2Task: zxteam.Task<LimitToken>;
+		let limitToken3Task: zxteam.Task<LimitToken>;
+		let limitToken4Task: zxteam.Task<LimitToken>;
 
 		try {
 			const cts = Task.createCancellationTokenSource();
