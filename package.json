@@ -1,15 +1,20 @@
 {
 	"name": "@zxteam/limit",
-	"version": "4.0.0",
+	"version": "5.0.1",
 	"description": "Limit JS",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
 	"author": {
-		"name": "Maxim Anurin",
-		"email": "maxim.anurin@zxteam.org",
-		"url": "http://www.anurin.name"
+		"name": "ZXTeam",
+		"email": "pub@project.zxteam.org",
+		"url": "http://www.zxteam.org"
 	},
 	"contributors": [
+		{
+			"name": "Maxim Anurin",
+			"email": "maxim.anurin@zxteam.org",
+			"url": "http://www.anurin.name"
+		},
 		{
 			"name": "Serhii Zghama",
 			"email": "serhii.zghama@zxteam.org"
@@ -17,14 +22,14 @@
 	],
 	"license": "MIT",
 	"dependencies": {
-		"@zxteam/contract": "^4.0.0",
-		"@zxteam/disposable": "^4.0.0",
-		"@zxteam/task": "^4.0.0"
+		"@zxteam/contract": "^5.0.1",
+		"@zxteam/disposable": "^5.0.1",
+		"@zxteam/task": "^5.0.1"
 	},
 	"devDependencies": {
-		"@types/node": "^11.13.9",
+		"@types/node": "^11.13.14",
 		"@types/sinon": "^7.0.11",
-		"@zxnode/build": "^0.0.33",
+		"@zxnode/build": "^0.0.34",
 		"sinon": "^7.3.2"
 	},
 	"engines": {
