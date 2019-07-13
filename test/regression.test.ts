@@ -50,7 +50,7 @@ describe("Regression", function () {
 				let disposing = false;
 				const limitDisposeTask = Task.run<void>(() => {
 					disposing = true;
-					return limit.dispose().promise;
+					return limit.dispose();
 				});
 
 				assert.isFalse(disposing, "Disposing process should NOT started before next tick");

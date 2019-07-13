@@ -9,7 +9,7 @@ export interface InternalLimit {
 	accrueToken(weight: Limit.Weight): LimitToken;
 	addReleaseTokenListener(cb: (availableTokens: number) => void): void;
 	removeReleaseTokenListener(cb: (availableTokens: number) => void): void;
-	dispose(): zxteam.Task<void>;
+	dispose(): Promise<void>;
 }
 
 export abstract class InternalLimitSyncBase extends Disposable implements InternalLimit {

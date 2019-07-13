@@ -1,5 +1,4 @@
 import * as zxteam from "@zxteam/contract";
-import { Task } from "@zxteam/task";
 
 import { Limit, LimitError, LimitToken, TokenLazyCallback } from "./contract";
 import { throwLimitConfigurationError, InternalLimit, AssertError } from "./internal/common";
@@ -334,7 +333,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		throw Error("Wrong arguments");
 	}
 
-	function dispose(): zxteam.Task<void> {
+	function dispose(): Promise<void> {
 		disposing = true;
 		waitForTokenCallbacks.slice().forEach(waitForTokenCallback => {
 			const tupleIndex = waitForTokenCallbacks.indexOf(waitForTokenCallback);
@@ -347,7 +346,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 			}
 			cb(new LimitError(`Timeout: Token was not accrued due disposing`));
 		});
-		return Task.run(async () => {
+		return Promise.resolve().then(async () => {
 			await Promise.all(innerLimits.map(il => il.dispose()));
 		});
 	}
