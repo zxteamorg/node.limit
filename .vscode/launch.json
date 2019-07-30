@@ -2,56 +2,28 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Debug TestApp",
+			"name": "Tests",
 			"type": "node",
 			"request": "launch",
 			"preLaunchTask": "compile:test:ts",
 			"runtimeExecutable": null,
 			"runtimeArgs": [
-				"--nolazy"
-			],
-			"stopOnEntry": false,
-			"program": "${workspaceRoot}/src/LimitTestApp.js",
-			"cwd": "${workspaceRoot}",
-			"env": {
-				"NODE_ENV": "development"
-			},
-			"console": "internalConsole",
-			"sourceMaps": true,
-			"outFiles": [
-				"${workspaceRoot}/src/**/*.js"
-			]
-		},
-		{
-			"name": "Debug Tests",
-			"type": "node",
-			"request": "launch",
-			"preLaunchTask": "compile:test:ts",
-			"runtimeExecutable": null,
-			"runtimeArgs": [
-				"--nolazy"
+				"--nolazy",
+				"--require",
+				"source-map-support/register"
 			],
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
 			"args": [
-				"--require",
-				"source-map-support/register",
-				"--timeout",
-				"10000",
+				"--no-timeouts",
 				"--colors",
 				"--debug-brk",
-				"test/**/*.test.js"
+				"test/**/*.js"
 			],
-			"cwd": "${workspaceRoot}",
 			"env": {
 				"NODE_ENV": "development"
 			},
-			"console": "internalConsole",
-			"sourceMaps": true,
-			"outFiles": [
-				"${workspaceRoot}/src/**/*.js",
-				"${workspaceRoot}/test/**/*.js"
-			]
+			"sourceMaps": true
 		}
 	]
 }

@@ -1,7 +1,8 @@
 import * as zxteam from "@zxteam/contract";
-import { assert } from "chai";
-
+import { SimpleCancellationTokenSource } from "@zxteam/cancellation";
 import { Task } from "@zxteam/task";
+
+import { assert } from "chai";
 
 import { limitFactory, LimitToken } from "../src";
 
@@ -19,7 +20,7 @@ describe("Generic tests", function () {
 		let limitToken4Task: zxteam.Task<LimitToken>;
 
 		try {
-			const cts = Task.createCancellationTokenSource();
+			const cts = new SimpleCancellationTokenSource();
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
@@ -68,7 +69,7 @@ describe("Generic tests", function () {
 		let limitToken4Task: zxteam.Task<LimitToken>;
 
 		try {
-			const cts = Task.createCancellationTokenSource();
+			const cts = new SimpleCancellationTokenSource();
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
@@ -116,7 +117,7 @@ describe("Generic tests", function () {
 		let limitToken4Task: zxteam.Task<LimitToken>;
 
 		try {
-			const cts = Task.createCancellationTokenSource();
+			const cts = new SimpleCancellationTokenSource();
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));

@@ -1,12 +1,10 @@
 {
 	"name": "@zxteam/limit",
-	"version": "6.0.1",
-	"description": "Limit JS",
-	"main": "./src/index.js",
-	"types": "./src/index.d.ts",
+	"version": "6.0.8",
+	"description": "Be in limits",
 	"author": {
 		"name": "ZXTeam",
-		"email": "pub@project.zxteam.org",
+		"email": "pub@zxteam.org",
 		"url": "http://www.zxteam.org"
 	},
 	"contributors": [
@@ -22,14 +20,14 @@
 	],
 	"license": "MIT",
 	"dependencies": {
-		"@zxteam/contract": "^6.0.1",
-		"@zxteam/disposable": "^6.0.1"
+		"@zxteam/contract": "^6.0.7",
+		"@zxteam/disposable": "^6.0.7"
 	},
 	"devDependencies": {
-		"@types/node": "^11.13.17",
+		"@types/node": "^11.13.18",
 		"@types/sinon": "^7.0.13",
-		"@zxteam/task": "^6.0.1",
 		"@zxnode/build": "^0.0.34",
+		"@zxteam/task": "^6.0.8",
 		"sinon": "^7.3.2"
 	},
 	"engines": {
@@ -38,16 +36,18 @@
 	"keywords": [],
 	"repository": {
 		"type": "git",
-		"url": "git+https://dev.zxteam.net/pub/node/limit.git"
+		"url": "https://github.com/zxteamorg/node.limit.git"
 	},
 	"bugs": {
-		"url": "https://dev.zxteam.net/pub/node/limit/issues"
+		"url": "https://github.com/zxteamorg/node.limit/issues"
 	},
-	"homepage": "https://dev.zxteam.net/pub/node/limit#readme",
+	"homepage": "https://github.com/zxteamorg/node.limit",
 	"scripts": {
-		"build": "zxbuild clean dist",
+		"build": "zxbuild clean dist && cp README.md .dist/",
 		"test": "nyc --exclude submodules --exclude test --extension=\".ts\" --reporter=lcov --reporter=text --reporter=text-summary mocha \"test/**/*.test.js\" --recursive",
 		"test:only": "mocha --require source-map-support/register \"test/**/*.test.js\" --recursive"
 	},
+	"main": "./src/index.js",
+	"types": "./src/index.d.ts",
 	"private": true
 }
