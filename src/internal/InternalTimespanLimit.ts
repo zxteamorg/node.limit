@@ -1,4 +1,4 @@
-import { LimitToken, LimitError, Limit } from "../contract";
+import { LimitError, Limit } from "../contract";
 import { InternalLimitSyncBase } from "./common";
 import { TokenDeferred } from "./misc";
 
@@ -40,7 +40,7 @@ export class InternalTimespanLimit extends InternalLimitSyncBase {
 		return this._maxTokens;
 	}
 
-	public accrueToken(weight: Limit.Weight): LimitToken {
+	public accrueToken(weight: Limit.Weight): Limit.Token {
 		super.verifyNotDisposed();
 		if (this.availableWeight < weight) { throw new LimitError("No any available tokens"); }
 
@@ -60,7 +60,7 @@ export class InternalTimespanLimit extends InternalLimitSyncBase {
 			defer = realDefer;
 		}
 
-		const token: LimitToken = {
+		const token: Limit.Token = {
 			commit: () => {
 				if (defer !== null) {
 					const selfDefer = defer;
@@ -87,7 +87,7 @@ export class InternalTimespanLimit extends InternalLimitSyncBase {
 				}
 			}
 		};
-		return token as LimitToken;
+		return token as Limit.Token;
 	}
 
 	protected async onDispose(): Promise<void> {

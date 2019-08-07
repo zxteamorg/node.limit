@@ -3,7 +3,7 @@ import { assert } from "chai";
 
 import { Task } from "@zxteam/task";
 
-import { limitFactory, LimitToken, LimitError } from "../src";
+import { limitFactory, Limit, LimitError } from "../src";
 
 async function nextTick() {
 	return new Promise(r => process.nextTick(r));
@@ -37,9 +37,9 @@ describe("Regression", function () {
 				parallel: 3
 			});
 
-			let limitToken1: LimitToken;
-			let limitToken2: LimitToken;
-			let limitToken3: LimitToken;
+			let limitToken1: Limit.Token;
+			let limitToken2: Limit.Token;
+			let limitToken3: Limit.Token;
 			try {
 				limitToken1 = limit.accrueTokenImmediately();
 				limitToken2 = limit.accrueTokenImmediately();
@@ -80,10 +80,10 @@ describe("Regression", function () {
 				parallel: 2
 			});
 
-			let limitToken1Task: zxteam.Task<LimitToken>;
-			let limitToken2Task: zxteam.Task<LimitToken>;
-			let limitToken3Task: zxteam.Task<LimitToken>;
-			let limitToken4Task: zxteam.Task<LimitToken>;
+			let limitToken1Task: zxteam.Task<Limit.Token>;
+			let limitToken2Task: zxteam.Task<Limit.Token>;
+			let limitToken3Task: zxteam.Task<Limit.Token>;
+			let limitToken4Task: zxteam.Task<Limit.Token>;
 			try {
 				limitToken1Task = Task.run(() => limit.accrueTokenLazy(10000));
 				assert.isFalse(limitToken1Task.isCompleted);

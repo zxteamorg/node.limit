@@ -1,6 +1,6 @@
 import * as zxteam from "@zxteam/contract";
 
-import { Limit, LimitError, LimitToken, TokenLazyCallback } from "./contract";
+import { Limit, LimitError } from "./contract";
 import { throwLimitConfigurationError, InternalLimit, AssertError } from "./internal/common";
 import { InternalParallelLimit } from "./internal/InternalParallelLimit";
 import { InternalTimespanLimit } from "./internal/InternalTimespanLimit";
@@ -62,7 +62,7 @@ function isCancellationToken(ct: any): ct is zxteam.CancellationToken {
 export function limitFactory(opts: Limit.Opts): Limit {
 	const innerLimits = buildInnerLimits(opts);
 	const busyLimits: Array<InternalLimit> = [];
-	const waitForTokenCallbacks: Array<[TokenLazyCallback, Function]> = [];
+	const waitForTokenCallbacks: Array<[Limit.TokenLazyCallback, Function]> = [];
 	let disposing = false;
 
 	function onBusyLimitsReleased(weight: Limit.Weight) {
@@ -84,10 +84,10 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		}
 	}
 
-	function _accrueAggregatedToken(weight: Limit.Weight): LimitToken | null {
+	function _accrueAggregatedToken(weight: Limit.Weight): Limit.Token | null {
 		if (busyLimits.length > 0) { return null; }
 		if (disposing) { return null; }
-		const innerTokens: Array<LimitToken> = [];
+		const innerTokens: Array<Limit.Token> = [];
 		for (let innerLimitIndex = 0; innerLimitIndex < innerLimits.length; innerLimitIndex++) {
 			const innerLimit = innerLimits[innerLimitIndex];
 			if (innerLimit.availableWeight < weight) {
@@ -118,7 +118,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		}
 	}
 
-	function accrueTokenImmediately(weight?: Limit.Weight): LimitToken {
+	function accrueTokenImmediately(weight?: Limit.Weight): Limit.Token {
 		if (disposing) { throw new Error("Wrong operation on disposed object"); }
 		const aggregatedToken = _accrueAggregatedToken(weight !== undefined ? weight : 1);
 		if (aggregatedToken != null) {
@@ -127,8 +127,8 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		throw new LimitError("No available tokens");
 	}
 
-	async function accrueTokenLazyWithCancellationTokenPromise(weight: Limit.Weight, ct: zxteam.CancellationToken): Promise<LimitToken> {
-		return new Promise<LimitToken>((resolve, reject) => {
+	async function accrueTokenLazyWithCancellationTokenPromise(weight: Limit.Weight, ct: zxteam.CancellationToken): Promise<Limit.Token> {
+		return new Promise<Limit.Token>((resolve, reject) => {
 			accrueTokenLazyWithCancellationTokenCallback(weight, ct, (err, token) => {
 				if (err) {
 					reject(err);
@@ -138,8 +138,8 @@ export function limitFactory(opts: Limit.Opts): Limit {
 			});
 		});
 	}
-	async function accrueTokenLazyWithTimeoutPromise(weight: Limit.Weight, timeout: number): Promise<LimitToken> {
-		return new Promise<LimitToken>((resolve, reject) => {
+	async function accrueTokenLazyWithTimeoutPromise(weight: Limit.Weight, timeout: number): Promise<Limit.Token> {
+		return new Promise<Limit.Token>((resolve, reject) => {
 			accrueTokenLazyWithTimeoutCallback(weight, timeout, (err, token) => {
 				if (err) {
 					reject(err);
@@ -149,8 +149,8 @@ export function limitFactory(opts: Limit.Opts): Limit {
 			});
 		});
 	}
-	async function accrueTokenLazyPromise(weight: Limit.Weight, timeout: number, ct: zxteam.CancellationToken): Promise<LimitToken> {
-		return new Promise<LimitToken>((resolve, reject) => {
+	async function accrueTokenLazyPromise(weight: Limit.Weight, timeout: number, ct: zxteam.CancellationToken): Promise<Limit.Token> {
+		return new Promise<Limit.Token>((resolve, reject) => {
 			accrueTokenLazyCallback(weight, timeout, ct, (err, token) => {
 				if (err) {
 					reject(err);
@@ -161,14 +161,15 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		});
 	}
 
-	function accrueTokenLazyWithCancellationTokenCallback(weight: Limit.Weight, ct: zxteam.CancellationToken, cb: TokenLazyCallback): void {
+	// tslint:disable-next-line: max-line-length
+	function accrueTokenLazyWithCancellationTokenCallback(weight: Limit.Weight, ct: zxteam.CancellationToken, cb: Limit.TokenLazyCallback): void {
 		const token = _accrueAggregatedToken(weight);
 		if (token !== null) {
 			cb(undefined, token);
 			return;
 		}
 
-		let tuple: [TokenLazyCallback, Function];
+		let tuple: [Limit.TokenLazyCallback, Function];
 		const cancelCallback = () => {
 			const tupleIndex = waitForTokenCallbacks.indexOf(tuple);
 			if (tupleIndex < 0) { throw new AssertError(); }
@@ -187,7 +188,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		tuple = [cb, removeListener];
 		waitForTokenCallbacks.push(tuple);
 	}
-	function accrueTokenLazyWithTimeoutCallback(weight: Limit.Weight, timeout: number, cb: TokenLazyCallback): void {
+	function accrueTokenLazyWithTimeoutCallback(weight: Limit.Weight, timeout: number, cb: Limit.TokenLazyCallback): void {
 		const token = _accrueAggregatedToken(weight);
 		if (token !== null) {
 			cb(undefined, token);
@@ -195,7 +196,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		}
 
 		// Timeout
-		let tuple: [TokenLazyCallback, Function];
+		let tuple: [Limit.TokenLazyCallback, Function];
 		const timer = setTimeout(() => {
 			const tupleIndex = waitForTokenCallbacks.indexOf(tuple);
 			if (tupleIndex < 0) { throw new AssertError(); }
@@ -206,7 +207,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		tuple = [cb, removeTimer];
 		waitForTokenCallbacks.push(tuple);
 	}
-	function accrueTokenLazyCallback(weight: Limit.Weight, timeout: number, ct: zxteam.CancellationToken, cb: TokenLazyCallback): void {
+	function accrueTokenLazyCallback(weight: Limit.Weight, timeout: number, ct: zxteam.CancellationToken, cb: Limit.TokenLazyCallback): void {
 		const token = _accrueAggregatedToken(weight);
 		if (token !== null) {
 			cb(undefined, token);
@@ -214,7 +215,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 		}
 
 		// Timeout
-		let tuple: [TokenLazyCallback, Function];
+		let tuple: [Limit.TokenLazyCallback, Function];
 		const timer = setTimeout(() => {
 			const tupleIndex = waitForTokenCallbacks.indexOf(tuple);
 			if (tupleIndex < 0) { throw new AssertError(); }
@@ -252,11 +253,11 @@ export function limitFactory(opts: Limit.Opts): Limit {
 			const arg0 = args[0];
 			if (typeof arg0 === "number") {
 				const timeout: number = arg0;
-				// CASE 1: accrueTokenLazy(timeout: number): Promise<LimitToken>
+				// CASE 1: accrueTokenLazy(timeout: number): Promise<Limit.Token>
 				return accrueTokenLazyWithTimeoutPromise(1/* weight */, timeout);
 			}
 			if (isCancellationToken(arg0)) {
-				// CASE 2: accrueTokenLazy(cancellationToken: CancellationToken): Promise<LimitToken>
+				// CASE 2: accrueTokenLazy(cancellationToken: CancellationToken): Promise<Limit.Token>
 				const cancellationToken: zxteam.CancellationToken = arg0;
 				return accrueTokenLazyWithCancellationTokenPromise(1/* weight */, cancellationToken);
 			}
@@ -271,13 +272,13 @@ export function limitFactory(opts: Limit.Opts): Limit {
 					return accrueTokenLazyWithTimeoutCallback(1/* weight */, timeout, callback);
 				}
 				if (typeof arg1 === "number") {
-					// CASE 6: accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number): Promise<LimitToken>
+					// CASE 6: accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number): Promise<Limit.Token>
 					const tokenWeight = possibleWeightOrTimeout;
 					const timeout = arg1;
 					return accrueTokenLazyWithTimeoutPromise(tokenWeight, timeout);
 				}
 				if (isCancellationToken(arg1)) {
-					// CASE 5: accrueTokenLazy(timeout: number, cancellationToken: CancellationToken): Promise<LimitToken>
+					// CASE 5: accrueTokenLazy(timeout: number, cancellationToken: CancellationToken): Promise<Limit.Token>
 					const timeout = possibleWeightOrTimeout;
 					const cancellationToken = arg1;
 					return accrueTokenLazyPromise(1/* weight */, timeout, cancellationToken);
@@ -309,7 +310,7 @@ export function limitFactory(opts: Limit.Opts): Limit {
 						return accrueTokenLazyWithTimeoutCallback(tokenWeight, timeout, callback);
 					}
 					if (isCancellationToken(arg2)) {
-						// CASE 9: accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number, cancellationToken: CancellationToken): Promise<LimitToken>
+						// CASE 9: accrueTokenLazy(tokenWeight: Limit.Weight, timeout: number, cancellationToken: CancellationToken): Promise<Limit.Token>
 						const tokenWeight = arg0;
 						const timeout = arg1;
 						const cancellationToken = arg2;

@@ -4,7 +4,7 @@ import { Task } from "@zxteam/task";
 
 import { assert } from "chai";
 
-import { limitFactory, LimitToken } from "../src";
+import { limitFactory, Limit } from "../src";
 
 describe("Generic tests", function () {
 	it("Should be able to cancel lazy accuring via Cancellation Token", async function () {
@@ -14,10 +14,10 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: zxteam.Task<LimitToken>;
-		let limitToken2Task: zxteam.Task<LimitToken>;
-		let limitToken3Task: zxteam.Task<LimitToken>;
-		let limitToken4Task: zxteam.Task<LimitToken>;
+		let limitToken1Task: zxteam.Task<Limit.Token>;
+		let limitToken2Task: zxteam.Task<Limit.Token>;
+		let limitToken3Task: zxteam.Task<Limit.Token>;
+		let limitToken4Task: zxteam.Task<Limit.Token>;
 
 		try {
 			const cts = new SimpleCancellationTokenSource();
@@ -63,10 +63,10 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: zxteam.Task<LimitToken>;
-		let limitToken2Task: zxteam.Task<LimitToken>;
-		let limitToken3Task: zxteam.Task<LimitToken>;
-		let limitToken4Task: zxteam.Task<LimitToken>;
+		let limitToken1Task: zxteam.Task<Limit.Token>;
+		let limitToken2Task: zxteam.Task<Limit.Token>;
+		let limitToken3Task: zxteam.Task<Limit.Token>;
+		let limitToken4Task: zxteam.Task<Limit.Token>;
 
 		try {
 			const cts = new SimpleCancellationTokenSource();
@@ -111,10 +111,10 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: zxteam.Task<LimitToken>;
-		let limitToken2Task: zxteam.Task<LimitToken>;
-		let limitToken3Task: zxteam.Task<LimitToken>;
-		let limitToken4Task: zxteam.Task<LimitToken>;
+		let limitToken1Task: zxteam.Task<Limit.Token>;
+		let limitToken2Task: zxteam.Task<Limit.Token>;
+		let limitToken3Task: zxteam.Task<Limit.Token>;
+		let limitToken4Task: zxteam.Task<Limit.Token>;
 
 		try {
 			const cts = new SimpleCancellationTokenSource();

@@ -1,12 +1,12 @@
 import * as zxteam from "@zxteam/contract";
 import { Disposable } from "@zxteam/disposable";
 
-import { LimitToken, Limit } from "../contract";
+import { Limit } from "../contract";
 
 export interface InternalLimit {
 	readonly availableWeight: number;
 	readonly maxWeight: number;
-	accrueToken(weight: Limit.Weight): LimitToken;
+	accrueToken(weight: Limit.Weight): Limit.Token;
 	addReleaseTokenListener(cb: (availableTokens: number) => void): void;
 	removeReleaseTokenListener(cb: (availableTokens: number) => void): void;
 	dispose(): Promise<void>;
@@ -16,7 +16,7 @@ export abstract class InternalLimitSyncBase extends Disposable implements Intern
 	private readonly _listeners: Array<(remainTokens: number) => void> = [];
 	public abstract get availableWeight(): number;
 	public abstract get maxWeight(): number;
-	public abstract accrueToken(weight: Limit.Weight): LimitToken;
+	public abstract accrueToken(weight: Limit.Weight): Limit.Token;
 	public addReleaseTokenListener(cb: (availableTokens: number) => void): void { this._listeners.push(cb); }
 	public removeReleaseTokenListener(cb: (availableTokens: number) => void): void {
 		const cbIndex = this._listeners.indexOf(cb);
