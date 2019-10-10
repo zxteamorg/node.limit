@@ -1,4 +1,3 @@
-import * as zxteam from "@zxteam/contract";
 import { assert } from "chai";
 
 import { Task } from "@zxteam/task";
@@ -80,10 +79,10 @@ describe("Regression", function () {
 				parallel: 2
 			});
 
-			let limitToken1Task: zxteam.Task<Limit.Token>;
-			let limitToken2Task: zxteam.Task<Limit.Token>;
-			let limitToken3Task: zxteam.Task<Limit.Token>;
-			let limitToken4Task: zxteam.Task<Limit.Token>;
+			let limitToken1Task: Task<Limit.Token>;
+			let limitToken2Task: Task<Limit.Token>;
+			let limitToken3Task: Task<Limit.Token>;
+			let limitToken4Task: Task<Limit.Token>;
 			try {
 				limitToken1Task = Task.run(() => limit.accrueTokenLazy(10000));
 				assert.isFalse(limitToken1Task.isCompleted);

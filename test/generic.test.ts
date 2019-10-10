@@ -1,10 +1,9 @@
-import * as zxteam from "@zxteam/contract";
-import { SimpleCancellationTokenSource } from "@zxteam/cancellation";
-import { Task } from "@zxteam/task";
+import { ManualCancellationTokenSource } from "@zxteam/cancellation";
 
 import { assert } from "chai";
 
 import { limitFactory, Limit } from "../src";
+import { Task } from "@zxteam/task";
 
 describe("Generic tests", function () {
 	it("Should be able to cancel lazy accuring via Cancellation Token", async function () {
@@ -14,13 +13,13 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: zxteam.Task<Limit.Token>;
-		let limitToken2Task: zxteam.Task<Limit.Token>;
-		let limitToken3Task: zxteam.Task<Limit.Token>;
-		let limitToken4Task: zxteam.Task<Limit.Token>;
+		let limitToken1Task: Task<Limit.Token>;
+		let limitToken2Task: Task<Limit.Token>;
+		let limitToken3Task: Task<Limit.Token>;
+		let limitToken4Task: Task<Limit.Token>;
 
 		try {
-			const cts = new SimpleCancellationTokenSource();
+			const cts = new ManualCancellationTokenSource();
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
@@ -63,13 +62,13 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: zxteam.Task<Limit.Token>;
-		let limitToken2Task: zxteam.Task<Limit.Token>;
-		let limitToken3Task: zxteam.Task<Limit.Token>;
-		let limitToken4Task: zxteam.Task<Limit.Token>;
+		let limitToken1Task: Task<Limit.Token>;
+		let limitToken2Task: Task<Limit.Token>;
+		let limitToken3Task: Task<Limit.Token>;
+		let limitToken4Task: Task<Limit.Token>;
 
 		try {
-			const cts = new SimpleCancellationTokenSource();
+			const cts = new ManualCancellationTokenSource();
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
@@ -111,13 +110,13 @@ describe("Generic tests", function () {
 			parallel: 2
 		});
 
-		let limitToken1Task: zxteam.Task<Limit.Token>;
-		let limitToken2Task: zxteam.Task<Limit.Token>;
-		let limitToken3Task: zxteam.Task<Limit.Token>;
-		let limitToken4Task: zxteam.Task<Limit.Token>;
+		let limitToken1Task: Task<Limit.Token>;
+		let limitToken2Task: Task<Limit.Token>;
+		let limitToken3Task: Task<Limit.Token>;
+		let limitToken4Task: Task<Limit.Token>;
 
 		try {
-			const cts = new SimpleCancellationTokenSource();
+			const cts = new ManualCancellationTokenSource();
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
