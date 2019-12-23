@@ -3,6 +3,7 @@ import { assert } from "chai";
 import { Task } from "@zxteam/task";
 
 import { limitFactory, Limit, LimitError } from "../src";
+import { DUMMY_CANCELLATION_TOKEN, sleep } from "@zxteam/cancellation";
 
 async function nextTick() {
 	return new Promise(r => process.nextTick(r));
@@ -86,21 +87,21 @@ describe("Regression", function () {
 			try {
 				limitToken1Task = Task.run(() => limit.accrueTokenLazy(10000));
 				assert.isFalse(limitToken1Task.isCompleted);
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 				assert.isTrue(limitToken1Task.isSuccessed);
 				limitToken1Task.result.commit(); // force to start timers in InternalTimespanLimit
 
 
 				limitToken2Task = Task.run(() => limit.accrueTokenLazy(10000));
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 				assert.isTrue(limitToken2Task.isSuccessed);
 
 				limitToken3Task = Task.run(() => limit.accrueTokenLazy(10000));
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 				assert.isTrue(limitToken3Task.isSuccessed);
 
 				limitToken4Task = Task.run(() => limit.accrueTokenLazy(10000));
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 				assert.isFalse(limitToken4Task.isCompleted);
 
 				let disposing = false;
@@ -110,7 +111,7 @@ describe("Regression", function () {
 				});
 
 				assert.isFalse(disposing, "Disposing process should NOT started before next tick");
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 				assert.isTrue(disposing, "Disposing process should started before next tick");
 				assert.isFalse(limitDisposeTask.isCompleted,
 					"Disposing process should NOT completed while limitToken2, limitToken3 still in use and limitToken4 in lazy accuring");
@@ -119,7 +120,7 @@ describe("Regression", function () {
 				limitToken3Task.result.commit();
 
 				assert.isFalse(limitDisposeTask.isCompleted, "Disposing process should NOT completed before next tick");
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 
 				assert.isTrue(limitToken4Task.isCompleted, "limitToken4Task should completed");
 				assert.isFalse(limitToken4Task.isSuccessed, "limitToken4Task should completed as error");

@@ -1,4 +1,4 @@
-import { ManualCancellationTokenSource } from "@zxteam/cancellation";
+import { ManualCancellationTokenSource, DUMMY_CANCELLATION_TOKEN, sleep } from "@zxteam/cancellation";
 
 import { assert } from "chai";
 
@@ -23,22 +23,22 @@ describe("Generic tests", function () {
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
-			await Task.sleep(5);
+			await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 			assert.isTrue(limitToken1Task.isSuccessed);
 			assert.isTrue(limitToken2Task.isSuccessed);
 
 			try {
 				limitToken3Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 				limitToken4Task = Task.run(() => limit.accrueTokenLazy(cts.token));
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 				assert.isFalse(limitToken3Task.isCompleted);
 				assert.isFalse(limitToken4Task.isCompleted);
 
 				cts.cancel();
-				await Task.sleep(5);
-				await Task.sleep(5);
-				await Task.sleep(5);
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 
 				assert.isTrue(limitToken3Task.isCompleted);
 				assert.isTrue(limitToken4Task.isCompleted);
@@ -72,21 +72,21 @@ describe("Generic tests", function () {
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
-			await Task.sleep(5);
+			await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 			assert.isTrue(limitToken1Task.isSuccessed);
 			assert.isTrue(limitToken2Task.isSuccessed);
 			try {
 				limitToken3Task = Task.run(() => limit.accrueTokenLazy(1000, cts.token));
 				limitToken4Task = Task.run(() => limit.accrueTokenLazy(1000, cts.token));
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 				assert.isFalse(limitToken3Task.isCompleted);
 				assert.isFalse(limitToken4Task.isCompleted);
 
 				cts.cancel();
-				await Task.sleep(5);
-				await Task.sleep(5);
-				await Task.sleep(5);
-				await Task.sleep(5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 
 				assert.isTrue(limitToken3Task.isCompleted);
 				assert.isTrue(limitToken4Task.isCompleted);
@@ -120,14 +120,14 @@ describe("Generic tests", function () {
 
 			limitToken1Task = Task.run(() => limit.accrueTokenLazy(cts.token));
 			limitToken2Task = Task.run(() => limit.accrueTokenLazy(cts.token));
-			await Task.sleep(5);
+			await sleep(DUMMY_CANCELLATION_TOKEN, 5);
 			assert.isTrue(limitToken1Task.isSuccessed);
 			assert.isTrue(limitToken2Task.isSuccessed);
 
 			try {
 				limitToken3Task = Task.run(() => limit.accrueTokenLazy(50, cts.token));
 				limitToken4Task = Task.run(() => limit.accrueTokenLazy(50, cts.token));
-				await Task.sleep(100);
+				await sleep(DUMMY_CANCELLATION_TOKEN, 100);
 				assert.isTrue(limitToken3Task.isCompleted, "limitToken3Task should complete");
 				assert.isTrue(limitToken4Task.isCompleted, "limitToken4Task should complete");
 				assert.isFalse(limitToken3Task.isSuccessed, "limitToken3Task should complete with failure");
