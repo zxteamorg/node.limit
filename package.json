@@ -1,6 +1,6 @@
 {
 	"name": "@zxteam/limit",
-	"version": "6.0.41",
+	"version": "6.0.63",
 	"description": "Be in limits",
 	"author": {
 		"name": "ZXTeam",
@@ -20,16 +20,15 @@
 	],
 	"license": "MIT",
 	"dependencies": {
-		"@zxteam/contract": "^6.0.40",
-		"@zxteam/disposable": "^6.0.40"
+		"@zxteam/contract": "^6.0.62",
+		"@zxteam/disposable": "^6.0.63"
 	},
 	"devDependencies": {
 		"@types/node": "^11.15.3",
-		"@types/sinon": "^7.5.1",
-		"@zxnode/build": "^0.0.34",
-		"@zxteam/cancellation": "^6.0.40",
-		"@zxteam/task": "^6.0.41",
-		"sinon": "^7.5.0"
+		"@types/sinon": "^9.0.4",
+		"@zxnode/build": "^0.0.38",
+		"@zxteam/cancellation": "^6.0.62",
+		"sinon": "^9.0.2"
 	},
 	"engines": {
 		"node": ">=11"
